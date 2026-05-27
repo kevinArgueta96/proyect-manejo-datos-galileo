@@ -1,11 +1,28 @@
 ---
 import data from "../data/results.json";
 const { models } = data;
+
+const rationale = [
+  { name: "Random Forest", color: "var(--cyan)", why: "Robusto con datos tabulares, maneja features mixtas (numericas + categoricas), interpretable via feature importance" },
+  { name: "Gradient Boosting", color: "var(--green)", why: "Aprende de errores secuencialmente, suele superar RF en datos complejos" },
+  { name: "XGBoost", color: "var(--amber)", why: "Optimizacion de GB con regularizacion, mas rapido y eficiente" },
+  { name: "SVM (RBF)", color: "var(--red)", why: "Buen rendimiento en alta dimensionalidad con class_weight=balanced" },
+];
 ---
 
 <section id="modelos" class="section">
   <div class="container">
-    <h2 class="section-title animate-on-scroll">Comparacion de Modelos</h2>
+    <h2 class="section-title animate-on-scroll">Modelos Propuestos</h2>
+
+    <!-- Rationale cards -->
+    <div class="grid-4 rationale-row">
+      {rationale.map((r, i) => (
+        <div class="card rationale-card animate-on-scroll" data-delay={`${i * 0.08}s`} style={`border-top: 2px solid ${r.color}`}>
+          <span class="rationale-name" style={`color: ${r.color}`}>{r.name}</span>
+          <p class="rationale-why">{r.why}</p>
+        </div>
+      ))}
+    </div>
 
     <div class="grid-2">
       <div class="card table-wrap animate-on-scroll" data-delay="0s">
@@ -169,5 +186,28 @@ const { models } = data;
     font-size: 0.85rem;
     font-variant-numeric: tabular-nums;
     color: var(--cyan);
+  }
+
+  /* Rationale cards */
+  .rationale-row {
+    margin-bottom: 1.5rem;
+  }
+
+  .rationale-card {
+    padding: 1rem 1.25rem;
+  }
+
+  .rationale-name {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+
+  .rationale-why {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
   }
 </style>

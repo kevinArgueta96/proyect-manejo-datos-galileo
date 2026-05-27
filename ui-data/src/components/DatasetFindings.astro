@@ -1,0 +1,186 @@
+---
+const findings = [
+  { icon: "&#x1F4CA;", text: "1,200 registros, 13 columnas — dataset limpio de Kaggle sin nulos ni duplicados" },
+  { icon: "&#x1F464;", text: "Edades 13-19, distribucion equilibrada entre generos (615 male, 585 female)" },
+  { icon: "&#x1F4F1;", text: "Promedio 4.5 hrs/dia en redes sociales, con maximo de 8 horas" },
+  { icon: "&#x1F4A4;", text: "Promedio 6.4 hrs de sueno — por debajo de las 8-10 recomendadas para adolescentes" },
+  { icon: "&#x26A0;&#xFE0F;", text: "depression_label muy desbalanceada: solo 2.5% positivos" },
+];
+
+const dataProblems = [
+  { label: "Desbalance de clases", desc: "Medio concentra ~61% de los datos, sesgando al modelo", color: "var(--amber)" },
+  { label: "Data leakage", desc: "stress, anxiety y addiction componen el target — eliminadas como features", color: "var(--red)" },
+  { label: "Senal debil", desc: "Variables de comportamiento tienen poder predictivo limitado para salud mental", color: "var(--cyan)" },
+];
+
+const varGroups = [
+  { title: "Demograficas", vars: ["age", "gender"], color: "var(--muted)" },
+  { title: "Redes sociales", vars: ["daily_social_media_hours", "platform_usage"], color: "var(--cyan)" },
+  { title: "Habitos", vars: ["sleep_hours", "screen_time_before_sleep", "physical_activity"], color: "var(--green)" },
+  { title: "Academico / Social", vars: ["academic_performance", "social_interaction_level"], color: "var(--amber)" },
+  { title: "Clinico", vars: ["depression_label"], color: "var(--red)" },
+  { title: "Engineered", vars: ["social_media_sleep_ratio", "total_screen_time", "activity_sleep_ratio"], color: "var(--green)" },
+];
+---
+
+<section id="hallazgos" class="section">
+  <div class="container">
+    <h2 class="section-title animate-on-scroll">Hallazgos del Dataset</h2>
+
+    <!-- Key findings -->
+    <div class="findings-list animate-on-scroll" data-delay="0.1s">
+      {findings.map((f) => (
+        <div class="finding-row">
+          <span class="finding-icon" set:html={f.icon} />
+          <p class="finding-text">{f.text}</p>
+        </div>
+      ))}
+    </div>
+
+    <!-- Data problems -->
+    <h3 class="sub-title animate-on-scroll" data-delay="0.15s">Problemas encontrados</h3>
+    <div class="grid-3 problems-grid">
+      {dataProblems.map((p, i) => (
+        <div class="card problem-item animate-on-scroll" data-delay={`${0.2 + i * 0.1}s`} style={`border-top: 3px solid ${p.color}`}>
+          <span class="problem-name" style={`color: ${p.color}`}>{p.label}</span>
+          <p class="problem-desc">{p.desc}</p>
+        </div>
+      ))}
+    </div>
+
+    <!-- Variables map -->
+    <h3 class="sub-title animate-on-scroll" data-delay="0.25s">Variables explicativas</h3>
+    <div class="var-map animate-on-scroll" data-delay="0.3s">
+      {varGroups.map((g) => (
+        <div class="var-group">
+          <span class="var-group-title" style={`color: ${g.color}`}>{g.title}</span>
+          <div class="var-tags">
+            {g.vars.map((v) => (
+              <code class="var-tag" style={`color: ${g.color}; background: color-mix(in srgb, ${g.color} 8%, transparent)`}>{v}</code>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .section {
+    padding: 3rem 0;
+  }
+
+  .findings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .finding-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.65rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+
+  .finding-row:hover {
+    background: color-mix(in srgb, var(--cyan) 3%, transparent);
+  }
+
+  .finding-icon {
+    flex-shrink: 0;
+    font-size: 1rem;
+  }
+
+  .finding-text {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .sub-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .problems-grid {
+    margin-bottom: 2.5rem;
+  }
+
+  .problem-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .problem-name {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .problem-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .var-map {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+  }
+
+  .var-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .var-group-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    min-width: 120px;
+    flex-shrink: 0;
+  }
+
+  .var-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .var-tag {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+  }
+
+  @media (max-width: 768px) {
+    .var-group {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.35rem;
+    }
+
+    .var-group-title {
+      min-width: auto;
+    }
+  }
+</style>

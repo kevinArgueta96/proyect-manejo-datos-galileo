@@ -1,20 +1,26 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
+import ProblemStatement from "../components/ProblemStatement.astro";
 import DatasetOverview from "../components/DatasetOverview.astro";
+import DatasetFindings from "../components/DatasetFindings.astro";
 import EDASection from "../components/EDASection.astro";
 import TargetDistributionChart from "../components/TargetDistributionChart.astro";
 import Methodology from "../components/Methodology.astro";
 import ModelComparison from "../components/ModelComparison.astro";
+import MetricsSection from "../components/MetricsSection.astro";
 import ResultsSection from "../components/ResultsSection.astro";
 import FeatureImportance from "../components/FeatureImportance.astro";
 import Conclusions from "../components/Conclusions.astro";
 
 const navLinks = [
+  { href: "#problema", label: "Problema" },
   { href: "#dataset", label: "Dataset" },
+  { href: "#hallazgos", label: "Hallazgos" },
   { href: "#eda", label: "EDA" },
-  { href: "#metodologia", label: "Metodologia" },
+  { href: "#metodologia", label: "Metodo" },
   { href: "#modelos", label: "Modelos" },
+  { href: "#metricas", label: "Metricas" },
   { href: "#resultados", label: "Resultados" },
   { href: "#conclusiones", label: "Conclusiones" },
 ];
@@ -38,7 +44,11 @@ const navLinks = [
   <main>
     <Header />
     <div class="section-divider"></div>
+    <ProblemStatement />
+    <div class="section-divider"></div>
     <DatasetOverview />
+    <div class="section-divider"></div>
+    <DatasetFindings />
     <div class="section-divider"></div>
     <EDASection />
     <div class="section-divider"></div>
@@ -47,6 +57,8 @@ const navLinks = [
     <Methodology />
     <div class="section-divider"></div>
     <ModelComparison />
+    <div class="section-divider"></div>
+    <MetricsSection />
     <div class="section-divider"></div>
     <ResultsSection />
     <div class="section-divider"></div>

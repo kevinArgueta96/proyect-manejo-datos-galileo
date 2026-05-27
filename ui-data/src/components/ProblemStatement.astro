@@ -1,0 +1,166 @@
+---
+---
+
+<section id="problema" class="section">
+  <div class="container">
+    <h2 class="section-title animate-on-scroll">Problema y Tipo de Tarea</h2>
+
+    <div class="problem-grid">
+      <div class="card problem-card animate-on-scroll" data-delay="0s">
+        <span class="problem-label">Pregunta de investigacion</span>
+        <p class="problem-question">
+          ¿Pueden los patrones de uso de redes sociales y habitos de vida de adolescentes (13-19 anos) predecir su nivel de riesgo de salud mental?
+        </p>
+      </div>
+
+      <div class="task-col">
+        <div class="card task-card animate-on-scroll" data-delay="0.1s">
+          <span class="task-badge">Tipo de tarea</span>
+          <h3 class="task-type">Clasificacion Supervisada Multiclase</h3>
+          <p class="task-desc">3 clases: Bajo, Medio, Alto</p>
+        </div>
+
+        <div class="card target-card animate-on-scroll" data-delay="0.2s">
+          <span class="task-badge target-badge">Variable objetivo</span>
+          <div class="target-formula">
+            <code>mental_health_risk</code>
+            <span class="formula-eq">=</span>
+            <span class="formula-body">promedio(stress, anxiety, addiction)</span>
+          </div>
+          <div class="threshold-row">
+            <span class="badge badge-green">Bajo ≤ 4</span>
+            <span class="badge badge-amber">Medio 4-7</span>
+            <span class="badge badge-red">Alto > 7</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .section {
+    padding: 3rem 0;
+  }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .problem-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    border-left: 4px solid var(--cyan);
+  }
+
+  .problem-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--cyan);
+    font-weight: 600;
+  }
+
+  .problem-question {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .task-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .task-card {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .task-badge {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+    font-weight: 600;
+    background: color-mix(in srgb, var(--amber) 10%, transparent);
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+  }
+
+  .target-badge {
+    color: var(--green);
+    background: color-mix(in srgb, var(--green) 10%, transparent);
+  }
+
+  .task-type {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .task-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .target-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .target-formula {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+  }
+
+  .target-formula code {
+    color: var(--green);
+    background: color-mix(in srgb, var(--green) 8%, transparent);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-family: inherit;
+  }
+
+  .formula-eq {
+    color: var(--muted);
+  }
+
+  .formula-body {
+    color: var(--text);
+  }
+
+  .threshold-row {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  @media (max-width: 768px) {
+    .problem-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .problem-question {
+      font-size: 1.1rem;
+    }
+  }
+</style>
