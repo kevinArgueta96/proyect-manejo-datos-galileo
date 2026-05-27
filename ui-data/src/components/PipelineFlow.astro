@@ -1,0 +1,145 @@
+---
+const steps = [
+  {
+    title: "Dataset",
+    subtitle: "1,200 registros, 13 cols",
+    color: "var(--cyan)",
+  },
+  {
+    title: "Limpieza",
+    subtitle: "0 nulos, 0 duplicados",
+    color: "var(--green)",
+  },
+  {
+    title: "Feature Eng.",
+    subtitle: "3 nuevas, 4 removidas",
+    color: "var(--amber)",
+  },
+  {
+    title: "Train/Test",
+    subtitle: "80% / 20% stratified",
+    color: "var(--cyan)",
+  },
+  {
+    title: "5 Modelos",
+    subtitle: "RF, GB, XGB, SVM, MLP",
+    color: "var(--amber)",
+  },
+  {
+    title: "Evaluacion",
+    subtitle: "MLP: 60.00% accuracy",
+    color: "var(--green)",
+  },
+];
+---
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-title animate-on-scroll">Pipeline de Machine Learning</h2>
+
+    <div class="pipeline-wrapper">
+      {steps.map((step, i) => (
+        <>
+          <div class="pipeline-step animate-on-scroll" data-delay={`${i * 0.08}s`}>
+            <div class="step-card" style={`--step-color: ${step.color}`}>
+              <div class="step-title">{step.title}</div>
+              <div class="step-subtitle">{step.subtitle}</div>
+            </div>
+          </div>
+
+          {i < steps.length - 1 && (
+            <div class="pipeline-arrow animate-on-scroll" data-delay={`${(i + 0.5) * 0.08}s`}>
+              →
+            </div>
+          )}
+        </>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .section {
+    padding: 3rem 0;
+  }
+
+  .pipeline-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .pipeline-step {
+    flex: 0 1 auto;
+  }
+
+  .step-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    border-left: 3px solid var(--step-color);
+    padding: 1.25rem 1.5rem;
+    min-width: 140px;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .step-card:hover {
+    border-color: var(--step-color);
+    box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .step-title {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .step-subtitle {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .pipeline-arrow {
+    flex: 0 0 auto;
+    font-size: 1.5rem;
+    color: var(--muted);
+    opacity: 0.6;
+    user-select: none;
+  }
+
+  /* Mobile: vertical stack with downward arrows */
+  @media (max-width: 768px) {
+    .pipeline-wrapper {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .pipeline-arrow {
+      font-size: 1rem;
+      transform: rotate(90deg);
+      margin: 0.25rem 0;
+    }
+
+    .step-card {
+      min-width: 130px;
+      padding: 1rem 1.25rem;
+    }
+
+    .step-title {
+      font-size: 0.9rem;
+    }
+
+    .step-subtitle {
+      font-size: 0.7rem;
+    }
+  }
+
+</style>

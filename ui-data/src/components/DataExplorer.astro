@@ -1,0 +1,422 @@
+---
+---
+
+<section id="explorador" class="section">
+  <div class="container">
+    <h2 class="section-title animate-on-scroll">Explorador de Datos</h2>
+    <p class="explorer-desc animate-on-scroll" data-delay="0.05s">
+      1,200 registros del dataset original. Filtra, ordena y busca en tiempo real.
+    </p>
+
+    <!-- Controls -->
+    <div class="controls animate-on-scroll" data-delay="0.1s">
+      <input type="text" id="searchInput" class="search-input" placeholder="Buscar en el dataset..." />
+
+      <div class="filter-group">
+        <select id="riskFilter" class="filter-select">
+          <option value="all">Todos los niveles</option>
+          <option value="Bajo">Bajo</option>
+          <option value="Medio">Medio</option>
+          <option value="Alto">Alto</option>
+        </select>
+
+        <select id="genderFilter" class="filter-select">
+          <option value="all">Todos generos</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+
+        <select id="platformFilter" class="filter-select">
+          <option value="all">Todas plataformas</option>
+          <option value="Instagram">Instagram</option>
+          <option value="TikTok">TikTok</option>
+          <option value="Both">Both</option>
+        </select>
+      </div>
+
+      <div class="stats-bar" id="statsBar">
+        <span class="stat-chip" id="statTotal">Total: —</span>
+        <span class="stat-chip" id="statFiltered">Mostrando: —</span>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card table-card animate-on-scroll" data-delay="0.15s">
+      <div class="table-scroll" id="tableScroll">
+        <table id="dataTable">
+          <thead id="tableHead"></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" id="pagination">
+        <button class="page-btn" id="prevBtn" disabled>&larr; Anterior</button>
+        <span class="page-info" id="pageInfo">1 / 1</span>
+        <button class="page-btn" id="nextBtn">Siguiente &rarr;</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", function() {
+    var allData = [];
+    var filteredData = [];
+    var headers = [];
+    var currentPage = 1;
+    var rowsPerPage = 25;
+    var sortCol = -1;
+    var sortAsc = true;
+
+    // Classify risk
+    function getRisk(row) {
+      var s = parseFloat(row[9]) || 0;  // stress_level
+      var a = parseFloat(row[10]) || 0; // anxiety_level
+      var d = parseFloat(row[11]) || 0; // addiction_level
+      var avg = (s + a + d) / 3;
+      if (avg <= 4) return "Bajo";
+      if (avg <= 7) return "Medio";
+      return "Alto";
+    }
+
+    // Load CSV
+    fetch("/data/dataset.csv")
+      .then(function(r) { return r.text(); })
+      .then(function(text) {
+        var lines = text.trim().split("\n");
+        headers = lines[0].split(",");
+        headers.push("risk_level");
+
+        for (var i = 1; i < lines.length; i++) {
+          var row = lines[i].split(",");
+          if (row.length === headers.length - 1) {
+            row.push(getRisk(row));
+            allData.push(row);
+          }
+        }
+
+        filteredData = allData.slice();
+        renderHead();
+        renderTable();
+        updateStats();
+      });
+
+    function renderHead() {
+      var thead = document.getElementById("tableHead");
+      var tr = document.createElement("tr");
+      headers.forEach(function(h, i) {
+        var th = document.createElement("th");
+        th.textContent = h;
+        th.style.cursor = "pointer";
+        th.addEventListener("click", function() {
+          if (sortCol === i) { sortAsc = !sortAsc; }
+          else { sortCol = i; sortAsc = true; }
+          sortData();
+          renderHead();
+          renderTable();
+        });
+        if (sortCol === i) {
+          th.textContent += sortAsc ? " ▲" : " ▼";
+        }
+        tr.appendChild(th);
+      });
+      thead.innerHTML = "";
+      thead.appendChild(tr);
+    }
+
+    function renderTable() {
+      var tbody = document.getElementById("tableBody");
+      tbody.innerHTML = "";
+      var start = (currentPage - 1) * rowsPerPage;
+      var end = Math.min(start + rowsPerPage, filteredData.length);
+      var totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
+
+      for (var i = start; i < end; i++) {
+        var tr = document.createElement("tr");
+        filteredData[i].forEach(function(cell, ci) {
+          var td = document.createElement("td");
+          if (ci === headers.length - 1) {
+            // risk_level column — badge
+            var span = document.createElement("span");
+            span.className = "risk-badge risk-" + cell.toLowerCase();
+            span.textContent = cell;
+            td.appendChild(span);
+          } else {
+            td.textContent = cell;
+          }
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      }
+
+      document.getElementById("pageInfo").textContent = currentPage + " / " + totalPages;
+      document.getElementById("prevBtn").disabled = currentPage <= 1;
+      document.getElementById("nextBtn").disabled = currentPage >= totalPages;
+    }
+
+    function sortData() {
+      filteredData.sort(function(a, b) {
+        var va = a[sortCol], vb = b[sortCol];
+        var na = parseFloat(va), nb = parseFloat(vb);
+        if (!isNaN(na) && !isNaN(nb)) {
+          return sortAsc ? na - nb : nb - na;
+        }
+        return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+      });
+      currentPage = 1;
+    }
+
+    function applyFilters() {
+      var search = document.getElementById("searchInput").value.toLowerCase();
+      var risk = document.getElementById("riskFilter").value;
+      var gender = document.getElementById("genderFilter").value;
+      var platform = document.getElementById("platformFilter").value;
+
+      filteredData = allData.filter(function(row) {
+        if (risk !== "all" && row[headers.length - 1] !== risk) return false;
+        if (gender !== "all" && row[1] !== gender) return false;
+        if (platform !== "all" && row[3] !== platform) return false;
+        if (search) {
+          var match = false;
+          for (var i = 0; i < row.length; i++) {
+            if (row[i].toLowerCase().indexOf(search) !== -1) { match = true; break; }
+          }
+          if (!match) return false;
+        }
+        return true;
+      });
+
+      if (sortCol >= 0) sortData();
+      currentPage = 1;
+      renderTable();
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById("statTotal").textContent = "Total: " + allData.length;
+      document.getElementById("statFiltered").textContent = "Mostrando: " + filteredData.length;
+    }
+
+    // Event listeners
+    document.getElementById("searchInput").addEventListener("input", applyFilters);
+    document.getElementById("riskFilter").addEventListener("change", applyFilters);
+    document.getElementById("genderFilter").addEventListener("change", applyFilters);
+    document.getElementById("platformFilter").addEventListener("change", applyFilters);
+
+    document.getElementById("prevBtn").addEventListener("click", function() {
+      if (currentPage > 1) { currentPage--; renderTable(); }
+    });
+    document.getElementById("nextBtn").addEventListener("click", function() {
+      var totalPages = Math.ceil(filteredData.length / rowsPerPage);
+      if (currentPage < totalPages) { currentPage++; renderTable(); }
+    });
+  });
+</script>
+
+<style is:global>
+  .explorer-desc {
+    font-size: 0.9rem;
+    color: #888;
+    margin-top: -1.5rem;
+    margin-bottom: 2rem;
+    padding-left: 1rem;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 0.65rem 1rem;
+    background: #12121a;
+    border: 1px solid #1e1e2e;
+    border-radius: 8px;
+    color: #e0e0e0;
+    font-size: 0.9rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-input:focus {
+    border-color: #00f0ff;
+    box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.1);
+  }
+
+  .search-input::placeholder {
+    color: #555;
+  }
+
+  .filter-group {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-select {
+    padding: 0.5rem 0.75rem;
+    background: #12121a;
+    border: 1px solid #1e1e2e;
+    border-radius: 6px;
+    color: #e0e0e0;
+    font-size: 0.8rem;
+    font-family: inherit;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .filter-select:focus {
+    border-color: #00f0ff;
+  }
+
+  .stats-bar {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .stat-chip {
+    font-size: 0.75rem;
+    color: #00f0ff;
+    background: rgba(0, 240, 255, 0.08);
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    padding: 0.25rem 0.6rem;
+    border-radius: 100px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .table-card {
+    overflow: hidden;
+  }
+
+  .table-scroll {
+    overflow-x: auto;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+
+  #dataTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+  }
+
+  #dataTable thead {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #12121a;
+  }
+
+  #dataTable th {
+    text-align: left;
+    padding: 0.6rem 0.65rem;
+    font-weight: 600;
+    color: #00f0ff;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid #1e1e2e;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  #dataTable th:hover {
+    background: rgba(0, 240, 255, 0.05);
+  }
+
+  #dataTable td {
+    padding: 0.45rem 0.65rem;
+    border-bottom: 1px solid #1e1e2e;
+    color: #e0e0e0;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  #dataTable tbody tr:hover {
+    background: rgba(0, 240, 255, 0.04);
+  }
+
+  #dataTable tbody tr:nth-child(even) {
+    background: rgba(0, 240, 255, 0.02);
+  }
+
+  .risk-badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  .risk-bajo {
+    background: rgba(74, 222, 128, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.3);
+  }
+
+  .risk-medio {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+  }
+
+  .risk-alto {
+    background: rgba(255, 107, 107, 0.15);
+    color: #ff6b6b;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+  }
+
+  /* Pagination */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-top: 1px solid #1e1e2e;
+  }
+
+  .page-btn {
+    padding: 0.4rem 1rem;
+    background: #12121a;
+    border: 1px solid #1e1e2e;
+    border-radius: 6px;
+    color: #00f0ff;
+    font-size: 0.8rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .page-btn:hover:not(:disabled) {
+    border-color: #00f0ff;
+    background: rgba(0, 240, 255, 0.05);
+  }
+
+  .page-btn:disabled {
+    color: #555;
+    cursor: not-allowed;
+  }
+
+  .page-info {
+    font-size: 0.8rem;
+    color: #888;
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 768px) {
+    .filter-group {
+      flex-direction: column;
+    }
+
+    .filter-select {
+      width: 100%;
+    }
+  }
+</style>

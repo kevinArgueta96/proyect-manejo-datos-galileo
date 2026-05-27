@@ -1,0 +1,203 @@
+---
+// RadarComparison.astro - Multi-dimensional model comparison radar chart
+---
+
+<section class="radar-section animate-on-scroll" data-delay="0.1s">
+  <h2 class="section-title">Comparacion Multidimensional de Modelos</h2>
+
+  <div class="card-container">
+    <canvas id="radarChart"></canvas>
+  </div>
+</section>
+
+<script is:inline>
+  // Wait for Chart.js to be loaded
+  function initRadarChart() {
+    if (typeof Chart === 'undefined') {
+      setTimeout(initRadarChart, 100);
+      return;
+    }
+
+    const ctx = document.getElementById('radarChart').getContext('2d');
+
+    const radarChart = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: ['Test Accuracy', 'CV Accuracy', 'Estabilidad', 'Recall Medio', 'Velocidad'],
+        datasets: [
+          {
+            label: 'Red Neuronal (MLP)',
+            data: [60.0, 60.7, 88.8, 98, 60],
+            borderColor: '#00f0ff',
+            backgroundColor: 'rgba(0, 240, 255, 0.1)',
+            fill: true,
+            borderWidth: 2,
+            pointRadius: 3,
+            pointBackgroundColor: '#00f0ff',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 1
+          },
+          {
+            label: 'Random Forest',
+            data: [58.3, 60.2, 91.5, 95, 85],
+            borderColor: 'rgba(0, 240, 255, 0.5)',
+            backgroundColor: 'rgba(0, 240, 255, 0.1)',
+            fill: true,
+            borderWidth: 2,
+            pointRadius: 3,
+            pointBackgroundColor: 'rgba(0, 240, 255, 0.5)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 1
+          },
+          {
+            label: 'Gradient Boosting',
+            data: [56.7, 55.1, 87.9, 90, 70],
+            borderColor: '#4ade80',
+            backgroundColor: 'rgba(74, 222, 128, 0.1)',
+            fill: true,
+            borderWidth: 2,
+            pointRadius: 3,
+            pointBackgroundColor: '#4ade80',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 1
+          },
+          {
+            label: 'XGBoost',
+            data: [53.3, 53.9, 94.7, 85, 90],
+            borderColor: '#fbbf24',
+            backgroundColor: 'rgba(251, 191, 36, 0.1)',
+            fill: true,
+            borderWidth: 2,
+            pointRadius: 3,
+            pointBackgroundColor: '#fbbf24',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 1
+          },
+          {
+            label: 'SVM',
+            data: [41.3, 34.6, 36.6, 70, 95],
+            borderColor: '#ff6b6b',
+            backgroundColor: 'rgba(255, 107, 107, 0.1)',
+            fill: true,
+            borderWidth: 2,
+            pointRadius: 3,
+            pointBackgroundColor: '#ff6b6b',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: '#e0e0e0',
+              font: {
+                size: 12,
+                family: "var(--font-body)"
+              },
+              padding: 15,
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(30, 30, 46, 0.95)',
+            titleColor: '#e0e0e0',
+            bodyColor: '#e0e0e0',
+            borderColor: '#1e1e2e',
+            borderWidth: 1,
+            padding: 10,
+            titleFont: {
+              size: 13,
+              family: "var(--font-body)"
+            },
+            bodyFont: {
+              size: 12,
+              family: "var(--font-body)"
+            }
+          }
+        },
+        scales: {
+          r: {
+            beginAtZero: true,
+            max: 100,
+            ticks: {
+              color: '#888',
+              font: {
+                size: 11,
+                family: "var(--font-body)"
+              },
+              stepSize: 20,
+              callback: function(value) {
+                return value;
+              }
+            },
+            grid: {
+              color: '#1e1e2e',
+              lineWidth: 1
+            },
+            pointLabels: {
+              color: '#e0e0e0',
+              font: {
+                size: 12,
+                weight: '500',
+                family: "var(--font-display)"
+              },
+              padding: 10
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initRadarChart);
+  } else {
+    initRadarChart();
+  }
+</script>
+
+<style>
+  .radar-section {
+    width: 100%;
+    padding: 2rem 1rem;
+  }
+
+  .section-title {
+    text-align: center;
+    font-size: 1.75rem;
+    font-family: var(--font-display);
+    color: var(--text);
+    margin-bottom: 2rem;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+  }
+
+  .card-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  @media (max-width: 768px) {
+    .card-container {
+      padding: 1.5rem;
+      max-width: 100%;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+  }
+</style>

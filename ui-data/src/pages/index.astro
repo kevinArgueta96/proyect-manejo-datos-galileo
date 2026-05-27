@@ -4,6 +4,7 @@ import Header from "../components/Header.astro";
 import ProblemStatement from "../components/ProblemStatement.astro";
 import DatasetOverview from "../components/DatasetOverview.astro";
 import DatasetFindings from "../components/DatasetFindings.astro";
+import DataExplorer from "../components/DataExplorer.astro";
 import EDASection from "../components/EDASection.astro";
 import TargetDistributionChart from "../components/TargetDistributionChart.astro";
 import Methodology from "../components/Methodology.astro";
@@ -12,6 +13,8 @@ import MetricsSection from "../components/MetricsSection.astro";
 import ResultsSection from "../components/ResultsSection.astro";
 import FeatureImportance from "../components/FeatureImportance.astro";
 import NeuralNetworkDemo from "../components/NeuralNetworkDemo.astro";
+import RadarComparison from "../components/RadarComparison.astro";
+import PipelineFlow from "../components/PipelineFlow.astro";
 import Conclusions from "../components/Conclusions.astro";
 
 const navLinks = [
@@ -49,6 +52,8 @@ const navLinks = [
     <div class="section-divider"></div>
     <DatasetOverview />
     <div class="section-divider"></div>
+    <DataExplorer />
+    <div class="section-divider"></div>
     <DatasetFindings />
     <div class="section-divider"></div>
     <EDASection />
@@ -65,7 +70,11 @@ const navLinks = [
     <div class="section-divider"></div>
     <FeatureImportance />
     <div class="section-divider"></div>
+    <PipelineFlow />
+    <div class="section-divider"></div>
     <NeuralNetworkDemo />
+    <div class="section-divider"></div>
+    <RadarComparison />
     <div class="section-divider"></div>
     <Conclusions />
   </main>

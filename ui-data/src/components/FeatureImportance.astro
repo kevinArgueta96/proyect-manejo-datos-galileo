@@ -30,16 +30,16 @@ const top10 = featureImportance.slice(0, 10);
     if (!ctx || typeof Chart === "undefined") return;
 
     const features = [
-      { f: "academic_performance", v: 0.155 },
-      { f: "social_media_sleep_ratio", v: 0.125 },
-      { f: "depression_label", v: 0.118 },
-      { f: "total_screen_time", v: 0.112 },
+      { f: "social_media_sleep_ratio", v: 0.120 },
+      { f: "academic_performance", v: 0.115 },
+      { f: "activity_sleep_ratio", v: 0.113 },
+      { f: "sleep_hours", v: 0.102 },
+      { f: "total_screen_time", v: 0.100 },
       { f: "daily_social_media_hours", v: 0.098 },
-      { f: "screen_time_before_sleep", v: 0.092 },
-      { f: "sleep_hours", v: 0.085 },
-      { f: "activity_sleep_ratio", v: 0.072 },
-      { f: "physical_activity", v: 0.058 },
-      { f: "age", v: 0.045 },
+      { f: "screen_time_before_sleep", v: 0.095 },
+      { f: "physical_activity", v: 0.080 },
+      { f: "age", v: 0.065 },
+      { f: "platform_usage", v: 0.038 },
     ];
 
     const maxVal = Math.max(...features.map(function(x) { return x.v; }));
