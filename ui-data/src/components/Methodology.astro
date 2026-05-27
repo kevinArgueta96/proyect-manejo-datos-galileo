@@ -1,0 +1,121 @@
+---
+import data from "../data/results.json";
+const { target, featureEngineering, splitStrategy } = data;
+
+const cards = [
+  {
+    color: "var(--cyan)",
+    icon: "&#x1F3AF;",
+    title: "Variable Objetivo",
+    items: [
+      `Formula: ${target.formula}`,
+      `Bajo: score ${target.thresholds.Bajo}`,
+      `Medio: score ${target.thresholds.Medio}`,
+      `Alto: score ${target.thresholds.Alto}`,
+    ],
+  },
+  {
+    color: "var(--green)",
+    icon: "&#x1F527;",
+    title: "Feature Engineering",
+    items: [
+      ...featureEngineering.created.map((f) => `${f.name} = ${f.formula}`),
+      `Leakage removido: ${featureEngineering.leakageRemoved.join(", ")}`,
+    ],
+  },
+  {
+    color: "var(--amber)",
+    icon: "&#x2702;&#xFE0F;",
+    title: "Division de Datos",
+    items: [
+      `Metodo: ${splitStrategy.method}`,
+      `Train: ${(splitStrategy.trainRatio * 100).toFixed(0)}%`,
+      `Test: ${(splitStrategy.testRatio * 100).toFixed(0)}%`,
+      `Random state: ${splitStrategy.randomState}`,
+    ],
+  },
+];
+---
+
+<section id="metodologia" class="section">
+  <div class="container">
+    <h2 class="section-title animate-on-scroll">Metodologia</h2>
+
+    <div class="grid-3">
+      {cards.map((card, i) => (
+        <div
+          class="card method-card animate-on-scroll"
+          data-delay={`${i * 0.15}s`}
+          style={`--card-color: ${card.color}; border-top: 3px solid ${card.color}`}
+        >
+          <div class="method-header">
+            <span class="method-icon" set:html={card.icon} />
+            <h3 class="method-title" style={`color: ${card.color}`}>{card.title}</h3>
+          </div>
+          <ul class="method-list">
+            {card.items.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .section {
+    padding: 3rem 0;
+  }
+
+  .method-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .method-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .method-icon {
+    font-size: 1.35rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .method-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .method-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .method-list li {
+    font-size: 0.9rem;
+    color: var(--text);
+    padding-left: 1rem;
+    position: relative;
+    line-height: 1.5;
+  }
+
+  .method-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--card-color);
+    box-shadow: 0 0 6px var(--card-color);
+  }
+</style>

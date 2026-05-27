@@ -1,0 +1,99 @@
+{
+  "project": {
+    "title": "Salud Mental en Adolescentes y Uso de Redes Sociales",
+    "subtitle": "Clasificación Supervisada: Bajo / Medio / Alto",
+    "university": "Universidad Galileo",
+    "author": "Kevin Argueta",
+    "year": 2026,
+    "course": "Manejo e Interpretación de Datos"
+  },
+  "dataset": {
+    "source": "Kaggle — Teen Mental Health Dataset",
+    "rows": 1200,
+    "columns": 13,
+    "nulls": 0,
+    "duplicates": 0,
+    "features": [
+      { "name": "age", "type": "int", "range": "13–19", "description": "Edad del adolescente" },
+      { "name": "gender", "type": "cat", "range": "male / female", "description": "Género" },
+      { "name": "daily_social_media_hours", "type": "float", "range": "1–8", "description": "Horas diarias en redes sociales" },
+      { "name": "platform_usage", "type": "cat", "range": "Instagram / TikTok / Both", "description": "Plataforma principal utilizada" },
+      { "name": "sleep_hours", "type": "float", "range": "4–9", "description": "Horas de sueño diarias" },
+      { "name": "screen_time_before_sleep", "type": "float", "range": "0.5–3", "description": "Horas de pantalla antes de dormir" },
+      { "name": "academic_performance", "type": "float", "range": "2–4", "description": "Rendimiento académico (GPA)" },
+      { "name": "physical_activity", "type": "float", "range": "0–2", "description": "Horas de actividad física diaria" },
+      { "name": "social_interaction_level", "type": "cat", "range": "low / medium / high", "description": "Nivel de interacción social presencial" },
+      { "name": "stress_level", "type": "int", "range": "1–10", "description": "Nivel de estrés autoreportado" },
+      { "name": "anxiety_level", "type": "int", "range": "1–10", "description": "Nivel de ansiedad autoreportado" },
+      { "name": "addiction_level", "type": "int", "range": "1–10", "description": "Nivel de adicción a redes sociales" },
+      { "name": "depression_label", "type": "bin", "range": "0 / 1", "description": "Etiqueta binaria de depresión" }
+    ]
+  },
+  "target": {
+    "name": "mental_health_risk",
+    "formula": "promedio(stress_level, anxiety_level, addiction_level)",
+    "thresholds": {
+      "Bajo": "≤ 4",
+      "Medio": "4 – 7",
+      "Alto": "> 7"
+    },
+    "distribution": {
+      "Bajo": 254,
+      "Medio": 731,
+      "Alto": 215
+    }
+  },
+  "featureEngineering": {
+    "created": [
+      { "name": "social_media_sleep_ratio", "formula": "daily_social_media_hours / sleep_hours" },
+      { "name": "total_screen_time", "formula": "daily_social_media_hours + screen_time_before_sleep" },
+      { "name": "activity_sleep_ratio", "formula": "physical_activity / sleep_hours" }
+    ],
+    "leakageRemoved": [
+      "stress_level",
+      "anxiety_level",
+      "addiction_level",
+      "mental_health_score"
+    ]
+  },
+  "splitStrategy": {
+    "method": "train_test_split stratified",
+    "trainRatio": 0.8,
+    "testRatio": 0.2,
+    "randomState": 42
+  },
+  "models": [
+    { "name": "Random Forest", "cvAccuracy": 0.6021, "cvStd": 0.0085, "testAccuracy": 0.5833, "best": true },
+    { "name": "Gradient Boosting", "cvAccuracy": 0.5717, "cvStd": 0.031, "testAccuracy": 0.5667, "best": false },
+    { "name": "XGBoost", "cvAccuracy": 0.5783, "cvStd": 0.027, "testAccuracy": 0.5333, "best": false },
+    { "name": "SVM", "cvAccuracy": 0.5525, "cvStd": 0.033, "testAccuracy": 0.4125, "best": false }
+  ],
+  "classificationReport": [
+    { "class": "Alto", "precision": 1.00, "recall": 0.02, "f1": 0.05, "support": 43 },
+    { "class": "Bajo", "precision": 0.00, "recall": 0.00, "f1": 0.00, "support": 51 },
+    { "class": "Medio", "precision": 0.60, "recall": 0.95, "f1": 0.74, "support": 146 }
+  ],
+  "featureImportance": [
+    { "feature": "social_media_sleep_ratio", "importance": 0.155 },
+    { "feature": "depression_label", "importance": 0.125 },
+    { "feature": "total_screen_time", "importance": 0.118 },
+    { "feature": "daily_social_media_hours", "importance": 0.112 },
+    { "feature": "screen_time_before_sleep", "importance": 0.098 },
+    { "feature": "sleep_hours", "importance": 0.092 },
+    { "feature": "activity_sleep_ratio", "importance": 0.085 },
+    { "feature": "academic_performance", "importance": 0.072 },
+    { "feature": "physical_activity", "importance": 0.058 },
+    { "feature": "age", "importance": 0.045 },
+    { "feature": "gender", "importance": 0.022 },
+    { "feature": "platform_usage", "importance": 0.010 },
+    { "feature": "social_interaction_level", "importance": 0.008 }
+  ],
+  "charts": {
+    "distribucionTarget": "/charts/grafica_distribucion_target.png",
+    "numericas": "/charts/grafica_numericas.png",
+    "correlacion": "/charts/grafica_correlacion.png",
+    "categoricaTarget": "/charts/grafica_categorica_target.png",
+    "confusion": "/charts/grafica_confusion.png",
+    "importancia": "/charts/grafica_importancia.png"
+  }
+}

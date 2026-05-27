@@ -1,0 +1,171 @@
+---
+import data from "../data/results.json";
+const { target } = data;
+const dist = target.distribution;
+const total = Object.values(dist).reduce((a: number, b: number) => a + b, 0);
+---
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-title animate-on-scroll">Distribucion del Target</h2>
+
+    <div class="chart-row animate-on-scroll" data-delay="0.1s">
+      <div class="card chart-container">
+        <canvas id="targetDoughnut"></canvas>
+      </div>
+
+      <div class="legend-col">
+        {[
+          { key: "Bajo", cls: "green", val: dist.Bajo },
+          { key: "Medio", cls: "amber", val: dist.Medio },
+          { key: "Alto", cls: "red", val: dist.Alto },
+        ].map((item, i) => (
+          <div class="legend-item animate-on-scroll" data-delay={`${0.2 + i * 0.1}s`}>
+            <span class={`dot dot-${item.cls}`}></span>
+            <div>
+              <strong>{item.key}</strong>
+              <span class="legend-detail">{item.val} ({((item.val / total) * 100).toFixed(1)}%)</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" is:inline></script>
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const ctx = document.getElementById("targetDoughnut");
+    if (!ctx) return;
+
+    // Center label plugin
+    const totalCount = [254, 731, 215].reduce(function(a, b) { return a + b; }, 0);
+    const centerLabel = {
+      id: "centerLabel",
+      afterDraw(chart) {
+        const { ctx: c, width, height } = chart;
+        c.save();
+        c.font = "800 28px Satoshi, Inter, sans-serif";
+        c.fillStyle = "#e0e0e0";
+        c.textAlign = "center";
+        c.textBaseline = "bottom";
+        c.fillText(totalCount.toLocaleString(), width / 2, height / 2 + 2);
+        c.font = "500 12px Inter, sans-serif";
+        c.fillStyle = "#888";
+        c.textBaseline = "top";
+        c.fillText("TOTAL", width / 2, height / 2 + 6);
+        c.restore();
+      },
+    };
+
+    new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: ["Bajo", "Medio", "Alto"],
+        datasets: [{
+          data: [254, 731, 215],
+          backgroundColor: ["#4ade80", "#fbbf24", "#ff6b6b"],
+          borderColor: "#12121a",
+          borderWidth: 3,
+          hoverOffset: 10,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        cutout: "65%",
+        animation: {
+          animateRotate: true,
+          animateScale: true,
+          duration: 1200,
+          easing: "easeOutQuart",
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: "#1e1e2e",
+            titleColor: "#e0e0e0",
+            bodyColor: "#e0e0e0",
+            borderColor: "#00f0ff",
+            borderWidth: 1,
+            padding: 12,
+            cornerRadius: 8,
+          },
+        },
+      },
+      plugins: [centerLabel],
+    });
+  });
+</script>
+
+<style>
+  .section {
+    padding: 3rem 0;
+  }
+
+  .chart-row {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+  }
+
+  .chart-container {
+    flex: 0 0 340px;
+    max-width: 340px;
+  }
+
+  .legend-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 8px currentColor;
+  }
+
+  .dot-green { background: var(--green); color: var(--green); }
+  .dot-amber { background: var(--amber); color: var(--amber); }
+  .dot-red { background: var(--red); color: var(--red); }
+
+  .legend-item strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1rem;
+  }
+
+  .legend-detail {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 768px) {
+    .chart-row {
+      flex-direction: column;
+    }
+
+    .chart-container {
+      flex: auto;
+      max-width: 300px;
+    }
+
+    .legend-col {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+  }
+</style>

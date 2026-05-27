@@ -1,0 +1,239 @@
+---
+import data from "../data/results.json";
+const { classificationReport, charts } = data;
+const accuracy = 58.33;
+const degree = (accuracy / 100) * 360;
+---
+
+<section id="resultados" class="section">
+  <div class="container">
+    <h2 class="section-title animate-on-scroll">Resultados del Mejor Modelo</h2>
+
+    <div class="results-hero animate-on-scroll" data-delay="0.1s">
+      <div class="accuracy-ring" id="accuracyRing">
+        <div class="accuracy-inner">
+          <span class="accuracy-val" id="accuracyVal">0%</span>
+          <span class="accuracy-label">Accuracy</span>
+        </div>
+      </div>
+      <div class="model-badge">
+        <span class="badge badge-cyan">Random Forest</span>
+        <p class="model-detail">Mejor modelo seleccionado por Cross-Validation (5-fold)</p>
+        <p class="model-baseline">Baseline aleatorio: <span class="glow-text" style="color: var(--red)">33.33%</span></p>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card animate-on-scroll" data-delay="0.15s">
+        <h3 class="card-title">Classification Report</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Clase</th>
+                <th>Precision</th>
+                <th>Recall</th>
+                <th>F1-Score</th>
+                <th>Support</th>
+              </tr>
+            </thead>
+            <tbody>
+              {classificationReport.map((row) => {
+                const f1Color = row.f1 >= 0.5 ? "var(--green)" : row.f1 >= 0.2 ? "var(--amber)" : "var(--red)";
+                return (
+                  <tr>
+                    <td>
+                      <span class={`badge badge-${row.class === "Bajo" ? "green" : row.class === "Medio" ? "amber" : "red"}`}>
+                        {row.class}
+                      </span>
+                    </td>
+                    <td>{row.precision.toFixed(2)}</td>
+                    <td>{row.recall.toFixed(2)}</td>
+                    <td class="f1-val" style={`color: ${f1Color}`}>{row.f1.toFixed(2)}</td>
+                    <td class="muted">{row.support}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card chart-card animate-on-scroll" data-delay="0.25s">
+        <h3 class="card-title">Matriz de Confusion</h3>
+        <div class="chart-img-wrap">
+          <img src={charts.confusion} alt="Matriz de Confusion" loading="lazy" data-lightbox />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const ring = document.getElementById("accuracyRing");
+    const valEl = document.getElementById("accuracyVal");
+    if (!ring || !valEl) return;
+
+    const targetAcc = 58.33;
+    const targetDeg = (targetAcc / 100) * 360;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          // Animate ring
+          const duration = 1800;
+          const start = performance.now();
+          const animate = (now) => {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const currentDeg = eased * targetDeg;
+            const currentVal = eased * targetAcc;
+            ring.style.background = `conic-gradient(#00f0ff 0deg, #00f0ff ${currentDeg}deg, #1e1e2e ${currentDeg}deg, #1e1e2e 360deg)`;
+            valEl.textContent = currentVal.toFixed(2) + "%";
+            if (progress < 1) requestAnimationFrame(animate);
+          };
+          requestAnimationFrame(animate);
+          observer.unobserve(ring);
+        });
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(ring);
+  });
+</script>
+
+<style>
+  .section {
+    padding: 3rem 0;
+  }
+
+  .results-hero {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+    justify-content: center;
+  }
+
+  .accuracy-ring {
+    width: 170px;
+    height: 170px;
+    border-radius: 50%;
+    background: conic-gradient(var(--cyan) 0deg, var(--cyan) 0deg, var(--border) 0deg, var(--border) 360deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.08);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .accuracy-inner {
+    width: 138px;
+    height: 138px;
+    border-radius: 50%;
+    background: var(--card);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .accuracy-val {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--cyan);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .accuracy-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .model-badge {
+    text-align: left;
+  }
+
+  .model-detail {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 0.5rem;
+    max-width: 280px;
+  }
+
+  .model-baseline {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 0.35rem;
+  }
+
+  .card-title {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .table-scroll {
+    overflow-x: auto;
+  }
+
+  .f1-val {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .muted {
+    color: var(--muted);
+  }
+
+  .chart-card {
+    overflow: hidden;
+  }
+
+  .chart-img-wrap {
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg);
+    cursor: zoom-in;
+  }
+
+  .chart-img-wrap img {
+    width: 100%;
+    transition: transform 0.35s ease;
+  }
+
+  .chart-img-wrap:hover img {
+    transform: scale(1.03);
+  }
+
+  @media (max-width: 768px) {
+    .results-hero {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .model-badge {
+      text-align: center;
+    }
+
+    .model-detail {
+      max-width: 100%;
+    }
+  }
+</style>

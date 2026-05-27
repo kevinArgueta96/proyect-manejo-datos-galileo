@@ -1,0 +1,128 @@
+---
+const conclusions = [
+  {
+    icon: "01",
+    color: "var(--cyan)",
+    title: "Rendimiento Moderado",
+    text: "El mejor modelo (Random Forest) alcanza 58.33% de accuracy — mejor que el baseline aleatorio (33.3%) pero refleja la complejidad inherente en predecir riesgo de salud mental sin variables directas de autoinforme.",
+  },
+  {
+    icon: "02",
+    color: "var(--green)",
+    title: "Clase Medio Domina",
+    text: "La clase Medio (F1=0.74) es la mejor clasificada gracias a su mayor representacion (731/1200). Las clases Bajo (recall=0.00) y Alto (recall=0.02) no logran ser detectadas, indicando seria dificultad para identificar riesgos extremos.",
+  },
+  {
+    icon: "03",
+    color: "var(--amber)",
+    title: "Features Derivadas Aportan",
+    text: "Las variables de ingenieria como social_media_sleep_ratio y total_screen_time aparecen en el top 5 de importancia, validando que las relaciones entre variables son mas predictivas que las variables individuales.",
+  },
+  {
+    icon: "04",
+    color: "var(--red)",
+    title: "Prevencion de Leakage",
+    text: "Eliminar stress_level, anxiety_level y addiction_level fue critico. Estas variables construyen directamente el target, por lo que incluirlas habria inflado artificialmente las metricas sin valor predictivo real.",
+  },
+];
+---
+
+<section id="conclusiones" class="section">
+  <div class="container">
+    <h2 class="section-title animate-on-scroll">Conclusiones</h2>
+
+    <div class="grid-2">
+      {conclusions.map((c, i) => (
+        <div class="card conclusion-card animate-on-scroll" data-delay={`${i * 0.12}s`} style={`border-top: 3px solid ${c.color}`}>
+          <div class="conclusion-header">
+            <span class="conclusion-num" style={`color: ${c.color}; text-shadow: 0 0 12px ${c.color === "var(--cyan)" ? "rgba(0,240,255,0.4)" : c.color === "var(--green)" ? "rgba(74,222,128,0.4)" : c.color === "var(--amber)" ? "rgba(251,191,36,0.4)" : "rgba(255,107,107,0.4)"}`}>{c.icon}</span>
+            <h3 class="conclusion-title">{c.title}</h3>
+          </div>
+          <p class="conclusion-text">{c.text}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-line"></div>
+    <p class="footer-tagline">Hecho con datos</p>
+    <p class="footer-info">Universidad Galileo &mdash; Manejo e Interpretacion de Datos &mdash; 2026</p>
+    <p class="footer-author">Kevin Argueta</p>
+  </div>
+</footer>
+
+<style>
+  .section {
+    padding: 3rem 0;
+  }
+
+  .conclusion-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .conclusion-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .conclusion-num {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .conclusion-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .conclusion-text {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  .site-footer {
+    padding: 3rem 0 2rem;
+    text-align: center;
+    margin-top: 2rem;
+  }
+
+  .footer-line {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border) 30%, var(--cyan) 50%, var(--border) 70%, transparent);
+    margin-bottom: 2rem;
+    box-shadow: 0 0 8px rgba(0, 240, 255, 0.15);
+  }
+
+  .footer-tagline {
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    color: var(--cyan);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .footer-info {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .footer-author {
+    font-size: 0.85rem;
+    color: var(--cyan);
+    font-weight: 600;
+    margin-top: 0.35rem;
+  }
+</style>

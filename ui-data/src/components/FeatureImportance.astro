@@ -1,0 +1,143 @@
+---
+import data from "../data/results.json";
+const { featureImportance, charts } = data;
+const top10 = featureImportance.slice(0, 10);
+---
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-title animate-on-scroll">Importancia de Features</h2>
+
+    <div class="grid-2">
+      <div class="card chart-card animate-on-scroll" data-delay="0s">
+        <h3 class="card-title">Grafica del Modelo</h3>
+        <div class="chart-img-wrap">
+          <img src={charts.importancia} alt="Feature Importance" loading="lazy" data-lightbox />
+        </div>
+      </div>
+
+      <div class="card animate-on-scroll" data-delay="0.15s">
+        <h3 class="card-title">Top 10 Features (Interactivo)</h3>
+        <canvas id="featureBarChart"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const ctx = document.getElementById("featureBarChart");
+    if (!ctx || typeof Chart === "undefined") return;
+
+    const features = [
+      { f: "social_media_sleep_ratio", v: 0.155 },
+      { f: "depression_label", v: 0.125 },
+      { f: "total_screen_time", v: 0.118 },
+      { f: "daily_social_media_hours", v: 0.112 },
+      { f: "screen_time_before_sleep", v: 0.098 },
+      { f: "sleep_hours", v: 0.092 },
+      { f: "activity_sleep_ratio", v: 0.085 },
+      { f: "academic_performance", v: 0.072 },
+      { f: "physical_activity", v: 0.058 },
+      { f: "age", v: 0.045 },
+    ];
+
+    const maxVal = Math.max(...features.map(function(x) { return x.v; }));
+
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: features.map(function(x) { return x.f; }),
+        datasets: [{
+          label: "Importancia",
+          data: features.map(function(x) { return x.v; }),
+          backgroundColor: features.map(function(x) {
+            var ratio = x.v / maxVal;
+            if (ratio > 0.8) return "rgba(0, 240, 255, 0.9)";
+            if (ratio > 0.6) return "rgba(0, 240, 255, 0.7)";
+            if (ratio > 0.4) return "rgba(0, 240, 255, 0.5)";
+            return "rgba(0, 240, 255, 0.3)";
+          }),
+          borderRadius: 4,
+          barThickness: 22,
+        }],
+      },
+      options: {
+        indexAxis: "y",
+        responsive: true,
+        maintainAspectRatio: true,
+        animation: {
+          duration: 1500,
+          easing: "easeOutQuart",
+          delay: function(context) {
+            return context.dataIndex * 100;
+          },
+        },
+        scales: {
+          x: {
+            grid: { color: "#1e1e2e" },
+            ticks: { color: "#888" },
+          },
+          y: {
+            grid: { display: false },
+            ticks: {
+              color: "#e0e0e0",
+              font: { size: 11, family: "JetBrains Mono, Fira Code, monospace" },
+            },
+          },
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: "#1e1e2e",
+            titleColor: "#e0e0e0",
+            bodyColor: "#e0e0e0",
+            borderColor: "#00f0ff",
+            borderWidth: 1,
+            padding: 12,
+            cornerRadius: 8,
+            callbacks: {
+              label: function(c) { return "Importancia: " + c.raw.toFixed(3); },
+            },
+          },
+        },
+      },
+    });
+  });
+</script>
+
+<style>
+  .section {
+    padding: 3rem 0;
+  }
+
+  .card-title {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .chart-card {
+    overflow: hidden;
+  }
+
+  .chart-img-wrap {
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg);
+    cursor: zoom-in;
+  }
+
+  .chart-img-wrap img {
+    width: 100%;
+    transition: transform 0.35s ease;
+  }
+
+  .chart-img-wrap:hover img {
+    transform: scale(1.03);
+  }
+</style>

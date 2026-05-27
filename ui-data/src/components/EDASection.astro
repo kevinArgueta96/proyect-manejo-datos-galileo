@@ -1,0 +1,69 @@
+---
+import data from "../data/results.json";
+const { charts } = data;
+const edaCharts = [
+  { src: charts.distribucionTarget, title: "Distribucion de Variable Target" },
+  { src: charts.numericas, title: "Variables Numericas" },
+  { src: charts.correlacion, title: "Matriz de Correlacion" },
+  { src: charts.categoricaTarget, title: "Variables Categoricas vs Target" },
+];
+---
+
+<section id="eda" class="section">
+  <div class="container">
+    <h2 class="section-title animate-on-scroll">Analisis Exploratorio (EDA)</h2>
+
+    <div class="grid-2">
+      {edaCharts.map((chart, i) => (
+        <div class="card chart-card animate-on-scroll" data-delay={`${i * 0.1}s`}>
+          <h3 class="chart-title">{chart.title}</h3>
+          <div class="chart-img-wrap">
+            <img src={chart.src} alt={chart.title} loading="lazy" data-lightbox />
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .section {
+    padding: 3rem 0;
+  }
+
+  .chart-card {
+    overflow: hidden;
+  }
+
+  .chart-title {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .chart-img-wrap {
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 4 / 3;
+  }
+
+  .chart-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.35s ease;
+    cursor: zoom-in;
+  }
+
+  .chart-img-wrap:hover img {
+    transform: scale(1.03);
+  }
+</style>

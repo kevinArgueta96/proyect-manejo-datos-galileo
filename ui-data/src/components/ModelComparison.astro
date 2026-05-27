@@ -1,0 +1,173 @@
+---
+import data from "../data/results.json";
+const { models } = data;
+---
+
+<section id="modelos" class="section">
+  <div class="container">
+    <h2 class="section-title animate-on-scroll">Comparacion de Modelos</h2>
+
+    <div class="grid-2">
+      <div class="card table-wrap animate-on-scroll" data-delay="0s">
+        <h3 class="card-title">Metricas de Rendimiento</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Modelo</th>
+                <th>CV Accuracy</th>
+                <th>Std</th>
+                <th>Test Accuracy</th>
+              </tr>
+            </thead>
+            <tbody>
+              {models.map((m) => (
+                <tr class={m.best ? "row-best" : ""}>
+                  <td>
+                    {m.name}
+                    {m.best && <span class="badge badge-green best-badge">Mejor</span>}
+                  </td>
+                  <td>{(m.cvAccuracy * 100).toFixed(2)}%</td>
+                  <td class="muted">&plusmn;{(m.cvStd * 100).toFixed(1)}%</td>
+                  <td class="acc-val">{(m.testAccuracy * 100).toFixed(2)}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card animate-on-scroll" data-delay="0.15s">
+        <h3 class="card-title">Test Accuracy Comparativo</h3>
+        <canvas id="modelBarChart"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const ctx = document.getElementById("modelBarChart");
+    if (!ctx || typeof Chart === "undefined") return;
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: ["Random Forest", "Gradient Boosting", "XGBoost", "SVM"],
+        datasets: [
+          {
+            label: "Test Accuracy (%)",
+            data: [58.33, 56.67, 53.33, 41.25],
+            backgroundColor: [
+              "rgba(0, 240, 255, 0.85)",
+              "rgba(74, 222, 128, 0.85)",
+              "rgba(251, 191, 36, 0.85)",
+              "rgba(255, 107, 107, 0.85)",
+            ],
+            borderRadius: 6,
+            barThickness: 36,
+          },
+        ],
+      },
+      options: {
+        indexAxis: "y",
+        responsive: true,
+        maintainAspectRatio: true,
+        animation: {
+          duration: 1500,
+          easing: "easeOutQuart",
+          delay: function(context) {
+            return context.dataIndex * 200;
+          },
+        },
+        scales: {
+          x: {
+            min: 30,
+            max: 65,
+            grid: { color: "#1e1e2e" },
+            ticks: { color: "#888", callback: function(v) { return v + "%"; } },
+          },
+          y: {
+            grid: { display: false },
+            ticks: { color: "#e0e0e0", font: { weight: "600", family: "Satoshi, Inter, sans-serif" } },
+          },
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: "#1e1e2e",
+            titleColor: "#e0e0e0",
+            bodyColor: "#e0e0e0",
+            borderColor: "#00f0ff",
+            borderWidth: 1,
+            padding: 12,
+            cornerRadius: 8,
+            callbacks: { label: function(c) { return c.raw + "%"; } },
+          },
+        },
+      },
+    });
+  });
+</script>
+
+<style>
+  .section {
+    padding: 3rem 0;
+  }
+
+  .card-title {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .table-wrap {
+    overflow: hidden;
+  }
+
+  .table-scroll {
+    overflow-x: auto;
+  }
+
+  .row-best {
+    background: color-mix(in srgb, var(--green) 8%, transparent);
+    position: relative;
+  }
+
+  .row-best td {
+    border-bottom-color: color-mix(in srgb, var(--green) 25%, var(--border));
+  }
+
+  .row-best td:first-child::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+  }
+
+  .best-badge {
+    margin-left: 0.5rem;
+    font-size: 0.65rem;
+    vertical-align: middle;
+  }
+
+  .muted {
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  .acc-val {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--cyan);
+  }
+</style>

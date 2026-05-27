@@ -1,0 +1,99 @@
+---
+interface Props {
+  title?: string;
+}
+
+const { title = "Salud Mental en Adolescentes — Dashboard ML" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Dashboard de análisis de salud mental en adolescentes y uso de redes sociales — Universidad Galileo" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,800&display=swap" rel="stylesheet" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <div class="scroll-progress" id="scrollProgress"></div>
+    <slot />
+
+    <!-- Lightbox -->
+    <div class="lightbox-dialog" id="lightbox">
+      <img src="" alt="Zoom" id="lightboxImg" />
+    </div>
+
+    <!-- Scroll to top -->
+    <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">&uarr;</button>
+  </body>
+</html>
+
+<style is:global>
+  @import "../styles/global.css";
+</style>
+
+<script is:inline>
+  // ── Scroll Animation Observer ──
+  document.addEventListener("DOMContentLoaded", () => {
+    const els = document.querySelectorAll(".animate-on-scroll");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const delay = entry.target.dataset.delay || "0s";
+            entry.target.style.transitionDelay = delay;
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
+    );
+    els.forEach((el) => observer.observe(el));
+  });
+
+  // ── Scroll Progress Bar ──
+  window.addEventListener("scroll", () => {
+    const bar = document.getElementById("scrollProgress");
+    if (!bar) return;
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    bar.style.width = pct + "%";
+  });
+
+  // ── Scroll to Top Button ──
+  window.addEventListener("scroll", () => {
+    const btn = document.getElementById("scrollTopBtn");
+    if (!btn) return;
+    btn.classList.toggle("visible", window.scrollY > 500);
+  });
+  document.getElementById("scrollTopBtn")?.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  // ── Lightbox ──
+  document.addEventListener("click", (e) => {
+    const img = e.target.closest("[data-lightbox]");
+    if (img) {
+      const dialog = document.getElementById("lightbox");
+      const lbImg = document.getElementById("lightboxImg");
+      if (dialog && lbImg) {
+        lbImg.src = img.src || img.querySelector("img")?.src || "";
+        lbImg.alt = img.alt || "Zoom";
+        dialog.classList.add("open");
+      }
+    }
+  });
+  document.getElementById("lightbox")?.addEventListener("click", (e) => {
+    e.currentTarget.classList.remove("open");
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") document.getElementById("lightbox")?.classList.remove("open");
+  });
+</script>

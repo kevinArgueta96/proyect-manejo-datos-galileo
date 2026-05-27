@@ -1,0 +1,227 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import DatasetOverview from "../components/DatasetOverview.astro";
+import EDASection from "../components/EDASection.astro";
+import TargetDistributionChart from "../components/TargetDistributionChart.astro";
+import Methodology from "../components/Methodology.astro";
+import ModelComparison from "../components/ModelComparison.astro";
+import ResultsSection from "../components/ResultsSection.astro";
+import FeatureImportance from "../components/FeatureImportance.astro";
+import Conclusions from "../components/Conclusions.astro";
+
+const navLinks = [
+  { href: "#dataset", label: "Dataset" },
+  { href: "#eda", label: "EDA" },
+  { href: "#metodologia", label: "Metodologia" },
+  { href: "#modelos", label: "Modelos" },
+  { href: "#resultados", label: "Resultados" },
+  { href: "#conclusiones", label: "Conclusiones" },
+];
+---
+
+<Layout>
+  <nav class="sticky-nav">
+    <div class="nav-inner">
+      <span class="nav-logo">SM Dashboard</span>
+      <div class="nav-links">
+        {navLinks.map((link) => (
+          <a href={link.href} class="nav-link">{link.label}</a>
+        ))}
+      </div>
+      <button class="nav-toggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main>
+    <Header />
+    <div class="section-divider"></div>
+    <DatasetOverview />
+    <div class="section-divider"></div>
+    <EDASection />
+    <div class="section-divider"></div>
+    <TargetDistributionChart />
+    <div class="section-divider"></div>
+    <Methodology />
+    <div class="section-divider"></div>
+    <ModelComparison />
+    <div class="section-divider"></div>
+    <ResultsSection />
+    <div class="section-divider"></div>
+    <FeatureImportance />
+    <div class="section-divider"></div>
+    <Conclusions />
+  </main>
+</Layout>
+
+<script is:inline>
+  // Mobile nav toggle
+  const toggle = document.querySelector(".nav-toggle");
+  const links = document.querySelector(".nav-links");
+  if (toggle && links) {
+    toggle.addEventListener("click", () => {
+      links.classList.toggle("open");
+      toggle.classList.toggle("active");
+    });
+    links.querySelectorAll("a").forEach((a) => {
+      a.addEventListener("click", () => {
+        links.classList.remove("open");
+        toggle.classList.remove("active");
+      });
+    });
+  }
+
+  // Active nav link on scroll with animated underline
+  const sections = document.querySelectorAll("section[id]");
+  const navAnchors = document.querySelectorAll(".nav-link");
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          navAnchors.forEach((a) => a.classList.remove("active"));
+          const active = document.querySelector('.nav-link[href="#' + entry.target.id + '"]');
+          if (active) active.classList.add("active");
+        }
+      });
+    },
+    { rootMargin: "-40% 0px -55% 0px" }
+  );
+  sections.forEach((s) => observer.observe(s));
+</script>
+
+<style is:global>
+  .sticky-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 3.5rem;
+  }
+
+  .nav-logo {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: var(--cyan);
+    letter-spacing: -0.02em;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .nav-link {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--muted);
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    transition: color var(--transition), background var(--transition);
+    position: relative;
+  }
+
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    right: 50%;
+    height: 2px;
+    background: var(--cyan);
+    border-radius: 1px;
+    transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 6px rgba(0, 240, 255, 0.4);
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--cyan);
+  }
+
+  .nav-link.active::after {
+    left: 0.75rem;
+    right: 0.75rem;
+  }
+
+  .nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+  }
+
+  .nav-toggle span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--muted);
+    border-radius: 2px;
+    transition: transform var(--transition), opacity var(--transition);
+  }
+
+  .nav-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(4px, 4px);
+  }
+
+  .nav-toggle.active span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .nav-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(4px, -4px);
+  }
+
+  main > :global(section),
+  main > :global(header) {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 768px) {
+    .nav-toggle {
+      display: flex;
+    }
+
+    .nav-links {
+      display: none;
+      position: absolute;
+      top: 3.5rem;
+      left: 0;
+      right: 0;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-direction: column;
+      padding: 0.75rem 1.5rem;
+    }
+
+    .nav-links.open {
+      display: flex;
+    }
+
+    .nav-link {
+      padding: 0.6rem 0.75rem;
+    }
+
+    .nav-link::after {
+      display: none;
+    }
+  }
+</style>
