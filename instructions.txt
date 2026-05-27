@@ -1,0 +1,14 @@
+De acuerdo al problema que se les dió autorización para trabajar, para el día de la preentrega se estará realizando una evaluación 1-on-1 donde se les realizará preguntas para evaluar y conocer cómo miran el problema y qué piensan realizar para resolverlo.
+Se les proporciona las siguientes preguntas de referencia:
+
+1 ¿Qué problema hay que resolver? ¿Qué tipo de tarea es? (e.g.: regresión, clasificación, etc.)
+2 ¿Qué hallazgos, descubrimientos y observaciones obtuvieron del dataset?
+2.1 ¿Qué problemas de data encontraron en el dataset?
+2.2 ¿Cuáles son las variables explicativas y explicadas de su proyecto?
+3 ¿Qué modelos de inteligencia artificial proponen usar para resolver el problema? (mínimo 3 modelos)
+4 ¿Qué metricas consideran útiles para resolver el problema?
+5. ¿Cuál es el reto más grande que consideran del proyecto?
+
+Adicionalmente, se les pide a los estudiantes presentar una plantilla del paper científico que piensan realizar para su proyecto
+y
+
