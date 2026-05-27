@@ -3,10 +3,11 @@ import data from "../data/results.json";
 const { models } = data;
 
 const rationale = [
-  { name: "Random Forest", color: "var(--cyan)", why: "Robusto con datos tabulares, maneja features mixtas (numericas + categoricas), interpretable via feature importance" },
+  { name: "Random Forest", color: "var(--cyan)", why: "Robusto con datos tabulares, maneja features mixtas, interpretable via feature importance" },
   { name: "Gradient Boosting", color: "var(--green)", why: "Aprende de errores secuencialmente, suele superar RF en datos complejos" },
   { name: "XGBoost", color: "var(--amber)", why: "Optimizacion de GB con regularizacion, mas rapido y eficiente" },
   { name: "SVM (RBF)", color: "var(--red)", why: "Buen rendimiento en alta dimensionalidad con class_weight=balanced" },
+  { name: "Red Neuronal (MLP)", color: "var(--cyan)", why: "Captura relaciones no lineales complejas. Arquitectura 64→32 con early stopping y StandardScaler" },
 ];
 ---
 
@@ -15,7 +16,7 @@ const rationale = [
     <h2 class="section-title animate-on-scroll">Modelos Propuestos</h2>
 
     <!-- Rationale cards -->
-    <div class="grid-4 rationale-row">
+    <div class="rationale-row">
       {rationale.map((r, i) => (
         <div class="card rationale-card animate-on-scroll" data-delay={`${i * 0.08}s`} style={`border-top: 2px solid ${r.color}`}>
           <span class="rationale-name" style={`color: ${r.color}`}>{r.name}</span>
@@ -69,19 +70,20 @@ const rationale = [
     new Chart(ctx, {
       type: "bar",
       data: {
-        labels: ["Random Forest", "Gradient Boosting", "XGBoost", "SVM"],
+        labels: ["Red Neuronal (MLP)", "Random Forest", "Gradient Boosting", "XGBoost", "SVM"],
         datasets: [
           {
             label: "Test Accuracy (%)",
-            data: [58.33, 56.67, 53.33, 41.25],
+            data: [60.00, 58.33, 56.67, 53.33, 41.25],
             backgroundColor: [
-              "rgba(0, 240, 255, 0.85)",
-              "rgba(74, 222, 128, 0.85)",
-              "rgba(251, 191, 36, 0.85)",
-              "rgba(255, 107, 107, 0.85)",
+              "rgba(0, 240, 255, 1)",
+              "rgba(0, 240, 255, 0.6)",
+              "rgba(74, 222, 128, 0.7)",
+              "rgba(251, 191, 36, 0.7)",
+              "rgba(255, 107, 107, 0.7)",
             ],
             borderRadius: 6,
-            barThickness: 36,
+            barThickness: 28,
           },
         ],
       },
@@ -190,7 +192,22 @@ const rationale = [
 
   /* Rationale cards */
   .rationale-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
     margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 1024px) {
+    .rationale-row {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .rationale-row {
+      grid-template-columns: 1fr;
+    }
   }
 
   .rationale-card {

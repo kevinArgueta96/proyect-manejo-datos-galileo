@@ -1,7 +1,7 @@
 ---
 import data from "../data/results.json";
 const { classificationReport, charts } = data;
-const accuracy = 58.33;
+const accuracy = 60.00;
 const degree = (accuracy / 100) * 360;
 ---
 
@@ -17,7 +17,7 @@ const degree = (accuracy / 100) * 360;
         </div>
       </div>
       <div class="model-badge">
-        <span class="badge badge-cyan">Random Forest</span>
+        <span class="badge badge-cyan">Red Neuronal (MLP)</span>
         <p class="model-detail">Mejor modelo seleccionado por Cross-Validation (5-fold)</p>
         <p class="model-baseline">Baseline aleatorio: <span class="glow-text" style="color: var(--red)">33.33%</span></p>
       </div>
@@ -75,7 +75,7 @@ const degree = (accuracy / 100) * 360;
     const valEl = document.getElementById("accuracyVal");
     if (!ring || !valEl) return;
 
-    const targetAcc = 58.33;
+    const targetAcc = 60.00;
     const targetDeg = (targetAcc / 100) * 360;
 
     const observer = new IntersectionObserver(

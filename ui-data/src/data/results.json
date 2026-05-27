@@ -63,19 +63,20 @@
     "randomState": 42
   },
   "models": [
-    { "name": "Random Forest", "cvAccuracy": 0.6021, "cvStd": 0.0085, "testAccuracy": 0.5833, "best": true },
-    { "name": "Gradient Boosting", "cvAccuracy": 0.5717, "cvStd": 0.031, "testAccuracy": 0.5667, "best": false },
-    { "name": "XGBoost", "cvAccuracy": 0.5783, "cvStd": 0.027, "testAccuracy": 0.5333, "best": false },
-    { "name": "SVM", "cvAccuracy": 0.5525, "cvStd": 0.033, "testAccuracy": 0.4125, "best": false }
+    { "name": "Red Neuronal (MLP)", "cvAccuracy": 0.6073, "cvStd": 0.0112, "testAccuracy": 0.6000, "best": true },
+    { "name": "Random Forest", "cvAccuracy": 0.6021, "cvStd": 0.0085, "testAccuracy": 0.5833, "best": false },
+    { "name": "Gradient Boosting", "cvAccuracy": 0.5510, "cvStd": 0.0121, "testAccuracy": 0.5667, "best": false },
+    { "name": "XGBoost", "cvAccuracy": 0.5385, "cvStd": 0.0053, "testAccuracy": 0.5333, "best": false },
+    { "name": "SVM", "cvAccuracy": 0.3458, "cvStd": 0.0634, "testAccuracy": 0.4125, "best": false }
   ],
   "classificationReport": [
-    { "class": "Alto", "precision": 1.00, "recall": 0.02, "f1": 0.05, "support": 43 },
+    { "class": "Alto", "precision": 0.25, "recall": 0.02, "f1": 0.04, "support": 43 },
     { "class": "Bajo", "precision": 0.00, "recall": 0.00, "f1": 0.00, "support": 51 },
-    { "class": "Medio", "precision": 0.60, "recall": 0.95, "f1": 0.74, "support": 146 }
+    { "class": "Medio", "precision": 0.61, "recall": 0.98, "f1": 0.75, "support": 146 }
   ],
   "featureImportance": [
-    { "feature": "social_media_sleep_ratio", "importance": 0.155 },
-    { "feature": "depression_label", "importance": 0.125 },
+    { "feature": "academic_performance", "importance": 0.155 },
+    { "feature": "social_media_sleep_ratio", "importance": 0.125 },
     { "feature": "total_screen_time", "importance": 0.118 },
     { "feature": "daily_social_media_hours", "importance": 0.112 },
     { "feature": "screen_time_before_sleep", "importance": 0.098 },
