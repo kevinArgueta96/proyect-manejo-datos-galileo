@@ -6,6 +6,8 @@ Universidad Galileo. Clasificación supervisada sobre el dataset *Teen Mental He
 diagnostica que una *accuracy* alta puede ser un espejismo y guía hacia el modelo
 correcto.
 
+📄 **[Leer el paper científico (PDF)](paper_manejo-datos-IA.pdf)**
+
 ## Contenido del repositorio
 
 | Archivo | Descripción |
