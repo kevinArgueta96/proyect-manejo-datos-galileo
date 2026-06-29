@@ -13,7 +13,7 @@ const rationale = [
 
 <section id="modelos" class="section">
   <div class="container">
-    <h2 class="section-title animate-on-scroll">Modelos Propuestos</h2>
+    <h2 class="section-title animate-on-scroll">Modelos Propuestos <span class="stage-tag">etapa inicial</span></h2>
 
     <!-- Rationale cards -->
     <div class="rationale-row">
@@ -43,7 +43,7 @@ const rationale = [
                 <tr class={m.best ? "row-best" : ""}>
                   <td>
                     {m.name}
-                    {m.best && <span class="badge badge-green best-badge">Mejor</span>}
+                    {m.best && <span class="badge badge-amber best-badge">Mejor por accuracy</span>}
                   </td>
                   <td>{(m.cvAccuracy * 100).toFixed(2)}%</td>
                   <td class="muted">&plusmn;{(m.cvStd * 100).toFixed(1)}%</td>
@@ -56,9 +56,20 @@ const rationale = [
       </div>
 
       <div class="card animate-on-scroll" data-delay="0.15s">
-        <h3 class="card-title">Test Accuracy Comparativo</h3>
+        <h3 class="card-title">Test Accuracy Comparativo <span class="card-sub">(métrica engañosa)</span></h3>
         <canvas id="modelBarChart"></canvas>
       </div>
+    </div>
+
+    <div class="card warn-note animate-on-scroll" data-delay="0.2s">
+      <span class="warn-icon">⚠️</span>
+      <p>
+        Esta comparativa usa <strong>accuracy</strong>, que es engañosa con clases
+        desbalanceadas: el 60% del MLP se logra prediciendo casi siempre la clase
+        mayoritaria. La comparativa <strong>justa</strong> —de enfoques, por
+        <em>balanced accuracy</em>— está en
+        <a href="#final">Modelo Final</a>, donde se corona el mejor modelo real.
+      </p>
     </div>
   </div>
 </section>
@@ -227,4 +238,43 @@ const rationale = [
     color: var(--muted);
     line-height: 1.5;
   }
+
+  .stage-tag {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--amber);
+    background: color-mix(in srgb, var(--amber) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--amber) 30%, var(--border));
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin-left: 0.5rem;
+  }
+  .card-sub {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--amber);
+    font-weight: 500;
+  }
+
+  .warn-note {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    border-left: 3px solid var(--amber);
+  }
+  .warn-icon { font-size: 1.1rem; line-height: 1.5; }
+  .warn-note p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+  .warn-note strong { color: var(--text); }
+  .warn-note a { color: var(--cyan); text-decoration: underline; }
 </style>

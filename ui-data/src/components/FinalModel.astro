@@ -1,0 +1,152 @@
+---
+import data from "../data/results.json";
+const { finalModel } = data;
+const { intro, target, targetDist, metrics, confusion, bestParams, featureImportance, journey, conclusion, honesty } = finalModel;
+const maxImp = Math.max(...featureImportance.map((f) => f.importance));
+---
+
+<section id="final" class="section">
+  <div class="container">
+    <h2 class="section-title animate-on-scroll">Modelo Final</h2>
+    <p class="section-intro animate-on-scroll">{intro}</p>
+
+    <!-- Headline metrics -->
+    <div class="metrics-row animate-on-scroll">
+      <div class="metric-big">
+        <span class="metric-num">{(metrics.balancedAccuracy * 100).toFixed(0)}%</span>
+        <span class="metric-lbl">Balanced Accuracy</span>
+      </div>
+      <div class="metric-big">
+        <span class="metric-num">{(metrics.f1Macro * 100).toFixed(0)}%</span>
+        <span class="metric-lbl">F1-macro</span>
+      </div>
+      <div class="metric-big">
+        <span class="metric-num">{confusion.matrix[1][1]}/{confusion.matrix[1][0] + confusion.matrix[1][1]}</span>
+        <span class="metric-lbl">Casos de depresión detectados</span>
+      </div>
+      <div class="metric-big subtle">
+        <span class="metric-num-sm">depression_label</span>
+        <span class="metric-lbl">Target real ({targetDist.pct}% positivos)</span>
+      </div>
+    </div>
+
+    <!-- The journey -->
+    <div class="card animate-on-scroll" data-delay="0s" style="margin-bottom:1.5rem">
+      <h3 class="card-title">El recorrido: cómo el EDA llevó al modelo</h3>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>Etapa</th><th>Target</th><th>Balanced Acc</th><th>F1-macro</th></tr>
+          </thead>
+          <tbody>
+            {journey.map((j) => (
+              <tr class={j.best ? "row-best" : ""}>
+                <td>{j.stage}{j.best && <span class="badge badge-green best-badge">Final</span>}</td>
+                <td class="muted">{j.target}</td>
+                <td class="acc-val">{j.balancedAccuracy.toFixed(2)}</td>
+                <td class="acc-val">{j.f1Macro.toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="hint">La balanced accuracy pasa de 0.33 (azar) a 1.00 — sin cambiar de algoritmo, solo siguiendo lo que el EDA reveló.</p>
+    </div>
+
+    <div class="grid-2">
+      <!-- Feature importance -->
+      <div class="card animate-on-scroll" data-delay="0s">
+        <h3 class="card-title">Variables que predicen la depresión</h3>
+        <div class="imp-list">
+          {featureImportance.map((f) => (
+            <div class="imp-item">
+              <span class="imp-name">{f.feature}</span>
+              <div class="imp-track"><div class="imp-bar" style={`width:${(f.importance / maxImp) * 100}%`}></div></div>
+              <span class="imp-val">{f.importance.toFixed(3)}</span>
+            </div>
+          ))}
+        </div>
+        <p class="hint">Sueño, estrés, ansiedad y redes sociales — coherente con la literatura de salud mental adolescente.</p>
+      </div>
+
+      <!-- Confusion matrix -->
+      <div class="card animate-on-scroll" data-delay="0.15s">
+        <h3 class="card-title">Matriz de confusión (test)</h3>
+        <div class="cm">
+          <div class="cm-corner"></div>
+          <div class="cm-head">Pred: No dep</div>
+          <div class="cm-head">Pred: Depresión</div>
+          <div class="cm-head row">Real: No dep</div>
+          <div class="cm-cell good">{confusion.matrix[0][0]}</div>
+          <div class="cm-cell">{confusion.matrix[0][1]}</div>
+          <div class="cm-head row">Real: Depresión</div>
+          <div class="cm-cell">{confusion.matrix[1][0]}</div>
+          <div class="cm-cell good">{confusion.matrix[1][1]}</div>
+        </div>
+        <p class="hint">Diagonal perfecta: 0 falsos positivos, 0 falsos negativos.</p>
+      </div>
+    </div>
+
+    <div class="card insight-card animate-on-scroll" data-delay="0s" style="margin-top:1.5rem">
+      <h3 class="card-title">Conclusión</h3>
+      <p class="insight-text">{conclusion}</p>
+      <div class="honesty">⚠️ {honesty}</div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .section { padding: 3rem 0; }
+  .section-intro { color: var(--muted); max-width: 66ch; line-height: 1.6; margin-bottom: 2rem; font-size: 0.95rem; }
+  .card-title {
+    font-family: var(--font-display); font-size: 1rem; font-weight: 600; color: var(--muted);
+    margin-bottom: 1.25rem; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .hint { font-size: 0.75rem; color: var(--muted); margin-top: 1rem; line-height: 1.5; }
+
+  .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+  @media (max-width: 820px) { .metrics-row { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .metrics-row { grid-template-columns: 1fr; } }
+  .metric-big {
+    background: color-mix(in srgb, var(--green) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--green) 25%, var(--border));
+    border-radius: 10px; padding: 1.25rem;
+    display: flex; flex-direction: column; gap: 0.35rem; align-items: flex-start;
+  }
+  .metric-big.subtle { background: color-mix(in srgb, var(--cyan) 6%, transparent); border-color: color-mix(in srgb, var(--cyan) 22%, var(--border)); }
+  .metric-num { font-family: var(--font-mono); font-size: 2.2rem; font-weight: 800; color: var(--green); line-height: 1; }
+  .metric-num-sm { font-family: var(--font-mono); font-size: 1.05rem; font-weight: 700; color: var(--cyan); }
+  .metric-lbl { font-size: 0.75rem; color: var(--muted); }
+
+  .table-scroll { overflow-x: auto; }
+  .muted { color: var(--muted); font-size: 0.82rem; font-family: var(--font-mono); }
+  .acc-val { font-family: var(--font-mono); font-weight: 700; font-size: 0.82rem; font-variant-numeric: tabular-nums; color: var(--cyan); }
+  .row-best { background: color-mix(in srgb, var(--green) 8%, transparent); }
+  .best-badge { margin-left: 0.5rem; font-size: 0.65rem; vertical-align: middle; }
+
+  .imp-list { display: flex; flex-direction: column; gap: 0.55rem; }
+  .imp-item { display: grid; grid-template-columns: 1.3fr 2fr auto; align-items: center; gap: 0.6rem; }
+  .imp-name { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text); }
+  .imp-track { background: var(--border); border-radius: 4px; height: 8px; overflow: hidden; }
+  .imp-bar { height: 100%; background: #7E57C2; border-radius: 4px; box-shadow: 0 0 6px rgba(126,87,194,0.5); }
+  .imp-val { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text); font-variant-numeric: tabular-nums; }
+
+  .cm { display: grid; grid-template-columns: auto 1fr 1fr; gap: 6px; }
+  .cm-corner { }
+  .cm-head { font-size: 0.72rem; color: var(--muted); text-align: center; align-self: center; font-family: var(--font-mono); }
+  .cm-head.row { text-align: right; padding-right: 0.5rem; }
+  .cm-cell {
+    font-family: var(--font-mono); font-size: 1.3rem; font-weight: 700;
+    text-align: center; padding: 1rem 0; border-radius: 8px;
+    background: var(--surface, #14141f); color: var(--muted);
+  }
+  .cm-cell.good { background: color-mix(in srgb, var(--green) 18%, transparent); color: var(--green); }
+
+  .insight-card { border-left: 3px solid var(--green); }
+  .insight-text { font-size: 0.92rem; line-height: 1.7; color: var(--text); }
+  .honesty {
+    margin-top: 1rem; font-size: 0.8rem; line-height: 1.6; color: var(--muted);
+    background: color-mix(in srgb, var(--amber) 8%, transparent);
+    border-radius: 6px; padding: 0.75rem 1rem;
+  }
+</style>

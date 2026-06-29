@@ -1,0 +1,318 @@
+---
+import data from "../data/results.json";
+const { improvements, charts } = data;
+const { intro, steps, smoteBalance, bestParams, comparison, conclusion } = improvements;
+---
+
+<section id="mejoras" class="section">
+  <div class="container">
+    <h2 class="section-title animate-on-scroll">Mejoras Metodológicas</h2>
+    <p class="section-intro animate-on-scroll">{intro}</p>
+
+    <!-- Step cards -->
+    <div class="steps-row">
+      {steps.map((s, i) => (
+        <div class="card step-card animate-on-scroll" data-delay={`${i * 0.08}s`} style={`border-top: 2px solid ${s.color}`}>
+          <span class="step-num" style={`color: ${s.color}`}>{i + 1}</span>
+          <span class="step-title" style={`color: ${s.color}`}>{s.title}</span>
+          <p class="step-desc">{s.desc}</p>
+        </div>
+      ))}
+    </div>
+
+    <!-- SMOTE: balance del set de entrenamiento -->
+    <div class="card animate-on-scroll smote-card" data-delay="0s">
+      <h3 class="card-title">Balanceo con SMOTE — Set de entrenamiento</h3>
+      <div class="smote-grid">
+        <div><canvas id="smoteChart"></canvas></div>
+        <div class="smote-side">
+          <div class="smote-rows">
+            {smoteBalance.classes.map((c, i) => (
+              <div class="smote-row">
+                <span class="smote-label">{c}</span>
+                <span class="smote-before">{smoteBalance.before[i]}</span>
+                <span class="smote-arrow">→</span>
+                <span class="smote-after">{smoteBalance.after[i]}</span>
+              </div>
+            ))}
+          </div>
+          <p class="hint">{smoteBalance.note}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:1.5rem">
+      <!-- Before/after comparison table -->
+      <div class="card table-wrap animate-on-scroll" data-delay="0s">
+        <h3 class="card-title">Base vs. Optimizado (test)</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Modelo</th>
+                <th>Accuracy</th>
+                <th>Bal. Acc.</th>
+                <th>F1-macro</th>
+              </tr>
+            </thead>
+            <tbody>
+              {comparison.map((m) => (
+                <tr class={m.best ? "row-best" : ""}>
+                  <td>
+                    {m.model}
+                    {m.best && <span class="badge badge-green best-badge">Justo</span>}
+                  </td>
+                  <td class="acc-val">{(m.accuracy * 100).toFixed(1)}%</td>
+                  <td class="acc-val">{(m.balancedAccuracy * 100).toFixed(1)}%</td>
+                  <td class="acc-val">{m.f1Macro.toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p class="hint">Azar (3 clases): Accuracy / Bal. Acc. ≈ 33.3%</p>
+
+        <h3 class="card-title" style="margin-top:1.5rem">Mejores hiperparámetros</h3>
+        <div class="params">
+          {Object.entries(bestParams).map(([k, v]) => (
+            <span class="param-chip"><span class="param-k">{k}</span>={v}</span>
+          ))}
+        </div>
+      </div>
+
+      <!-- Metric comparison chart -->
+      <div class="card animate-on-scroll" data-delay="0.15s">
+        <h3 class="card-title">Accuracy vs. métricas justas</h3>
+        <canvas id="improvementsChart"></canvas>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:1.5rem">
+      <div class="card animate-on-scroll" data-delay="0s">
+        <h3 class="card-title">Matriz de confusión — Modelo optimizado</h3>
+        <img src={charts.confusionOptimizado} alt="Matriz de confusión del modelo optimizado" class="chart-img" loading="lazy" />
+      </div>
+      <div class="card insight-card animate-on-scroll" data-delay="0.15s">
+        <h3 class="card-title">Hallazgo clave</h3>
+        <p class="insight-text">{conclusion}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const smoteCtx = document.getElementById("smoteChart");
+    if (smoteCtx && typeof Chart !== "undefined") {
+      new Chart(smoteCtx, {
+        type: "bar",
+        data: {
+          labels: ["Bajo", "Medio", "Alto"],
+          datasets: [
+            { label: "Antes de SMOTE", data: [152, 439, 129], backgroundColor: "rgba(255, 107, 107, 0.65)", borderRadius: 6 },
+            { label: "Después de SMOTE", data: [439, 439, 439], backgroundColor: "rgba(74, 222, 128, 0.75)", borderRadius: 6 },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          animation: { duration: 1400, easing: "easeOutQuart" },
+          scales: {
+            y: { min: 0, max: 480, grid: { color: "#1e1e2e" }, ticks: { color: "#888" } },
+            x: { grid: { display: false }, ticks: { color: "#e0e0e0", font: { weight: "600", family: "Satoshi, Inter, sans-serif" } } },
+          },
+          plugins: {
+            legend: { labels: { color: "#e0e0e0", font: { family: "Satoshi, Inter, sans-serif" } } },
+            tooltip: {
+              backgroundColor: "#1e1e2e", titleColor: "#e0e0e0", bodyColor: "#e0e0e0",
+              borderColor: "#00f0ff", borderWidth: 1, padding: 12, cornerRadius: 8,
+              callbacks: { label: function(c) { return c.dataset.label + ": " + c.raw + " muestras"; } },
+            },
+          },
+        },
+      });
+    }
+
+    const ctx = document.getElementById("improvementsChart");
+    if (!ctx || typeof Chart === "undefined") return;
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: ["Accuracy", "Balanced Acc.", "F1-macro"],
+        datasets: [
+          {
+            label: "Base (MLP)",
+            data: [60.0, 33.3, 26.0],
+            backgroundColor: "rgba(0, 240, 255, 0.65)",
+            borderRadius: 6,
+          },
+          {
+            label: "SMOTE + RF (optimizado)",
+            data: [42.9, 28.0, 27.0],
+            backgroundColor: "rgba(74, 222, 128, 0.7)",
+            borderRadius: 6,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        animation: { duration: 1400, easing: "easeOutQuart" },
+        scales: {
+          y: {
+            min: 0,
+            max: 65,
+            grid: { color: "#1e1e2e" },
+            ticks: { color: "#888", callback: function(v) { return v + "%"; } },
+          },
+          x: {
+            grid: { display: false },
+            ticks: { color: "#e0e0e0", font: { weight: "600", family: "Satoshi, Inter, sans-serif" } },
+          },
+        },
+        plugins: {
+          legend: { labels: { color: "#e0e0e0", font: { family: "Satoshi, Inter, sans-serif" } } },
+          tooltip: {
+            backgroundColor: "#1e1e2e",
+            titleColor: "#e0e0e0",
+            bodyColor: "#e0e0e0",
+            borderColor: "#00f0ff",
+            borderWidth: 1,
+            padding: 12,
+            cornerRadius: 8,
+            callbacks: { label: function(c) { return c.dataset.label + ": " + c.raw + "%"; } },
+          },
+        },
+      },
+    });
+  });
+</script>
+
+<style>
+  .section { padding: 3rem 0; }
+
+  .section-intro {
+    color: var(--muted);
+    max-width: 60ch;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+  }
+
+  .card-title {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .steps-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  @media (max-width: 1024px) { .steps-row { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px)  { .steps-row { grid-template-columns: 1fr; } }
+
+  .step-card { padding: 1.25rem; position: relative; }
+
+  .step-num {
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    font-weight: 800;
+    opacity: 0.35;
+    position: absolute;
+    top: 0.75rem;
+    right: 1rem;
+  }
+
+  .step-title {
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .step-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.55; }
+
+  .table-wrap { overflow: hidden; }
+  .table-scroll { overflow-x: auto; }
+
+  .row-best { background: color-mix(in srgb, var(--green) 8%, transparent); position: relative; }
+  .row-best td { border-bottom-color: color-mix(in srgb, var(--green) 25%, var(--border)); }
+  .row-best td:first-child::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+  }
+
+  .best-badge { margin-left: 0.5rem; font-size: 0.65rem; vertical-align: middle; }
+
+  .acc-val {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--cyan);
+  }
+
+  .hint { font-size: 0.72rem; color: var(--muted); margin-top: 0.75rem; }
+
+  .params { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .param-chip {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    background: color-mix(in srgb, var(--amber) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--amber) 30%, var(--border));
+    border-radius: 6px;
+    padding: 0.25rem 0.55rem;
+    color: var(--text);
+  }
+  .param-k { color: var(--amber); }
+
+  .chart-img {
+    width: 100%;
+    border-radius: 8px;
+    display: block;
+  }
+
+  .smote-card { margin-bottom: 0; }
+  .smote-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 1.5rem;
+    align-items: center;
+  }
+  @media (max-width: 768px) { .smote-grid { grid-template-columns: 1fr; } }
+
+  .smote-side { display: flex; flex-direction: column; gap: 1rem; }
+  .smote-rows { display: flex; flex-direction: column; gap: 0.5rem; }
+  .smote-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+  .smote-label { font-weight: 600; color: var(--text); }
+  .smote-before { color: var(--red); font-variant-numeric: tabular-nums; }
+  .smote-arrow { color: var(--muted); }
+  .smote-after { color: var(--green); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  .insight-card { border-left: 3px solid var(--amber); }
+  .insight-text {
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: var(--text);
+  }
+</style>

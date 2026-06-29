@@ -92,6 +92,105 @@
     "correlacion": "/charts/grafica_correlacion.png",
     "categoricaTarget": "/charts/grafica_categorica_target.png",
     "confusion": "/charts/grafica_confusion.png",
-    "importancia": "/charts/grafica_importancia.png"
+    "importancia": "/charts/grafica_importancia.png",
+    "confusionOptimizado": "/charts/grafica_confusion_optimizado.png"
+  },
+  "improvements": {
+    "intro": "El modelo base alcanza 60% de accuracy, pero se colapsa a la clase mayoritaria. Aplicando un flujo metodológico riguroso, exponemos la verdadera dificultad del problema en lugar de ocultarla tras una métrica inflada.",
+    "steps": [
+      { "title": "Conjunto de validación", "icon": "split", "color": "var(--cyan)", "desc": "Partición estratificada 60/20/20 (train/val/test). El test se reserva para una única medición final, evitando sobreajuste optimista." },
+      { "title": "Muestreo SMOTE", "icon": "balance", "color": "var(--green)", "desc": "Oversampling sintético de clases minoritarias dentro del Pipeline, aplicado solo a los folds de entrenamiento para evitar data leakage." },
+      { "title": "RandomizedSearchCV", "icon": "tune", "color": "var(--amber)", "desc": "40 combinaciones con StratifiedKFold×5, optimizando F1-macro (no accuracy) sobre hiperparámetros de RandomForest y SMOTE." },
+      { "title": "Métricas para desbalance", "icon": "metric", "color": "var(--red)", "desc": "Balanced accuracy y F1-macro ponderan las 3 clases por igual, penalizando el abandono de las minoritarias." }
+    ],
+    "smoteBalance": {
+      "note": "SMOTE balancea SOLO el set de entrenamiento (60%). Val y test conservan la distribución real para una evaluación honesta.",
+      "classes": ["Bajo", "Medio", "Alto"],
+      "before": [152, 439, 129],
+      "after": [439, 439, 439]
+    },
+    "bestParams": {
+      "n_estimators": 200,
+      "max_depth": "None",
+      "min_samples_leaf": 2,
+      "max_features": 0.5,
+      "smote_k_neighbors": 3
+    },
+    "comparison": [
+      { "model": "Base (MLP)", "accuracy": 0.600, "balancedAccuracy": 0.333, "f1Macro": 0.26, "best": false },
+      { "model": "SMOTE + RF (optimizado)", "accuracy": 0.429, "balancedAccuracy": 0.280, "f1Macro": 0.27, "best": true }
+    ],
+    "conclusion": "Aunque la accuracy cae de 60% a 43%, su balanced accuracy revela que el modelo base solo predecía 'Medio' (recall 0.98) e ignoraba 'Bajo' y 'Alto' (recall ≈0). El F1-macro casi no cambia (0.26→0.27): las variables disponibles no contienen señal suficiente. Ni el balanceo ni la optimización pueden crear información predictiva inexistente."
+  },
+  "toolbox": {
+    "intro": "Aplicamos herramientas adicionales del toolkit de ciencia de datos para validar la calidad de los datos y reducir el ruido en las variables.",
+    "anomaly": {
+      "zscore": { "method": "Z-score (|z| > 3)", "outliers": 0, "color": "var(--green)" },
+      "isolationForest": { "method": "Isolation Forest (contam. 2%)", "outliers": 24, "color": "var(--amber)" },
+      "note": "0 outliers por Z-score confirma datos limpios. Las distribuciones casi uniformes hacen que la detección de anomalías no aporte señal adicional."
+    },
+    "anova": [
+      { "feature": "depression_label", "fscore": 16.53 },
+      { "feature": "total_screen_time", "fscore": 2.09 },
+      { "feature": "activity_sleep_ratio", "fscore": 1.81 },
+      { "feature": "physical_activity", "fscore": 1.67 },
+      { "feature": "screen_time_before_sleep", "fscore": 1.59 },
+      { "feature": "daily_social_media_hours", "fscore": 1.27 }
+    ],
+    "rfe": {
+      "selected": ["daily_social_media_hours", "sleep_hours", "academic_performance", "social_media_sleep_ratio", "total_screen_time", "activity_sleep_ratio"],
+      "totalFeatures": 13,
+      "comparison": [
+        { "config": "13 features (todas)", "accuracy": 0.429, "balancedAccuracy": 0.280, "f1Macro": 0.273, "best": false },
+        { "config": "6 features (RFE)", "accuracy": 0.421, "balancedAccuracy": 0.292, "f1Macro": 0.292, "best": true }
+      ]
+    },
+    "conclusion": "RFE mejora levemente F1-macro (0.273→0.292) y balanced accuracy (0.280→0.292) al eliminar variables ruidosas. La mejora es real pero modesta: confirma que el techo del problema está limitado por la información disponible, no por la cantidad de features."
+  },
+  "targetReeval": {
+    "intro": "El EDA reveló la causa raíz del sesgo: el target se construyó como el promedio de stress + anxiety + addiction, lo que concentra el 60.9% de los casos en 'Medio' por efecto estadístico. Redefinirlo por percentiles (33/33/33) balancea las clases por diseño.",
+    "distributions": {
+      "classes": ["Bajo", "Medio", "Alto"],
+      "original": [254, 731, 215],
+      "percentiles": [484, 362, 354]
+    },
+    "controlHighlight": { "accuracy": 0.90, "label": "La señal predictiva vive en estrés, ansiedad y sueño" },
+    "comparison": [
+      { "target": "Umbrales fijos (promedio)", "distribution": "731 / 254 / 215", "balancedAccuracy": 0.31, "f1Macro": 0.31, "best": false },
+      { "target": "Percentiles 33/33/33", "distribution": "484 / 362 / 354", "balancedAccuracy": 0.39, "f1Macro": 0.39, "best": true }
+    ],
+    "comparisonNote": "Al redefinir el target, la balanced accuracy supera por primera vez el azar (0.333): las variables digitales/de sueño SÍ aportan señal, antes enmascarada por el promediado.",
+    "control": {
+      "note": "Aquí incluirlas es leakage SOLO porque este target se deriva de ellas (es su promedio). El hallazgo clave: la señal existe y está en esas variables.",
+      "rows": [
+        { "features": "Solo digitales/sueño", "accuracy": 0.41, "balancedAccuracy": 0.39, "f1Macro": 0.39, "leak": false },
+        { "features": "+ estrés / ansiedad / adicción", "accuracy": 0.90, "balancedAccuracy": 0.90, "f1Macro": 0.90, "leak": true }
+      ]
+    },
+    "conclusion": "El experimento prueba que la señal predictiva existe y vive en estrés, ansiedad y sueño. Aquí es leakage porque el target se deriva de esas variables — pero eso señala la solución: si elegimos un target que NO se derive de ellas, se vuelven predictores legítimos. Eso es exactamente lo que hace el Modelo Final con depression_label."
+  },
+  "finalModel": {
+    "intro": "El análisis EDA fue el que produjo la mejora — no un algoritmo más potente. El EDA diagnosticó que el target inventado estaba sesgado, el control localizó dónde vivía la señal, y esa evidencia nos llevó a usar un target real (depression_label) con las mismas variables ahora como predictores legítimos.",
+    "target": "depression_label",
+    "targetDist": { "positivos": 31, "total": 1200, "pct": 2.6 },
+    "metrics": { "accuracy": 1.0, "balancedAccuracy": 1.0, "f1Macro": 1.0 },
+    "confusion": { "labels": ["No dep", "Depresión"], "matrix": [[234, 0], [0, 6]] },
+    "bestParams": { "n_estimators": 200, "max_depth": 6, "min_samples_leaf": 1, "max_features": 0.5, "smote_k_neighbors": 7 },
+    "featureImportance": [
+      { "feature": "sleep_hours", "importance": 0.334 },
+      { "feature": "stress_level", "importance": 0.292 },
+      { "feature": "anxiety_level", "importance": 0.190 },
+      { "feature": "daily_social_media_hours", "importance": 0.152 },
+      { "feature": "gender", "importance": 0.020 },
+      { "feature": "academic_performance", "importance": 0.007 }
+    ],
+    "journey": [
+      { "stage": "Inicial (MLP)", "target": "mental_health_risk", "balancedAccuracy": 0.33, "f1Macro": 0.26 },
+      { "stage": "Optimizado (SMOTE+RF)", "target": "mental_health_risk", "balancedAccuracy": 0.28, "f1Macro": 0.27 },
+      { "stage": "Target redefinido", "target": "percentiles 33/33/33", "balancedAccuracy": 0.39, "f1Macro": 0.39 },
+      { "stage": "Final", "target": "depression_label", "balancedAccuracy": 1.0, "f1Macro": 1.0, "best": true }
+    ],
+    "conclusion": "El modelo final detecta los 6 casos de depresión del test sin falsos positivos. Las variables clave (sueño, estrés, ansiedad, redes) son coherentes con la literatura. La mejora vino de la metodología EDA — diagnóstico y selección de target — no de la fuerza bruta.",
+    "honesty": "El dataset es sintético: la regla de generación de la depresión (estrés y ansiedad altos, sueño bajo, redes altas) es aprendible casi perfectamente. En datos reales esperaríamos menor exactitud, pero la metodología de diagnóstico es lo que aporta el valor."
   }
 }

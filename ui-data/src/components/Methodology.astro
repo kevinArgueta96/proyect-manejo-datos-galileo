@@ -20,6 +20,7 @@ const { target, featureEngineering, splitStrategy } = data;
         </div>
         <p class="method-formula">
           <code>mental_health_risk</code>
+          <span class="target-tag">target inicial</span>
         </p>
         <p class="method-desc">Promedio de stress, anxiety y addiction</p>
         <div class="threshold-grid">
@@ -36,6 +37,11 @@ const { target, featureEngineering, splitStrategy } = data;
             <span class="threshold-val">{target.thresholds.Alto}</span>
           </div>
         </div>
+        <p class="target-note">
+          ⚠️ El EDA reveló que este target (un promedio) estaba sesgado a 'Medio'.
+          El modelo final usa <code>depression_label</code> — ver
+          <a href="#final">Modelo Final</a>.
+        </p>
       </div>
 
       <!-- Card 2: Feature Engineering -->
@@ -139,6 +145,35 @@ const { target, featureEngineering, splitStrategy } = data;
     font-size: 0.85rem;
     color: var(--muted);
   }
+
+  .target-tag {
+    display: inline-block;
+    margin-left: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--amber);
+    background: color-mix(in srgb, var(--amber) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--amber) 30%, var(--border));
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    vertical-align: middle;
+  }
+
+  .target-note {
+    margin-top: 0.9rem;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    color: var(--muted);
+    border-top: 1px dashed var(--border);
+    padding-top: 0.6rem;
+  }
+  .target-note code {
+    font-family: var(--font-mono);
+    color: var(--green);
+  }
+  .target-note a { color: var(--cyan); text-decoration: underline; }
 
   .threshold-grid {
     display: flex;
