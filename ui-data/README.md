@@ -1,43 +1,53 @@
-# Astro Starter Kit: Minimal
+# Dashboard — Salud Mental en Adolescentes
 
-```sh
-pnpm create astro@latest -- --template minimal
+Dashboard web interactivo que presenta de forma visual el paper científico del
+proyecto de **Manejo de Datos para la IA** (Universidad Galileo). Recorre todo el
+análisis: EDA, comparativa de modelos, mejoras metodológicas (SMOTE, RandomizedSearch,
+detección de anomalías, RFE), reevaluación del target y el modelo final de predicción
+de depresión.
+
+Construido con [Astro](https://astro.build) y [Chart.js](https://www.chartjs.org).
+
+## Requisitos
+
+- Node.js 18+
+- `pnpm` (recomendado) o `npm`
+
+## Cómo levantarlo
+
+```bash
+pnpm install      # o: npm install
+pnpm dev          # o: npm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Abre la URL que imprime la terminal (por defecto `http://localhost:4321`).
 
-## 🚀 Project Structure
+## Comandos
 
-Inside of your Astro project, you'll see the following folders and files:
+| Comando | Acción |
+|---|---|
+| `pnpm install` | Instala dependencias |
+| `pnpm dev` | Servidor de desarrollo en `localhost:4321` |
+| `pnpm build` | Genera el sitio estático en `dist/` |
+| `pnpm preview` | Sirve el build de producción localmente |
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+## Publicar
+
+El sitio es estático. Tras `pnpm build`, sube el contenido de `dist/` a cualquier
+host estático (GitHub Pages, Netlify, Vercel).
+
+## Estructura
+
+```
+src/
+├── components/        # Secciones del dashboard (.astro)
+├── data/
+│   └── results.json   # Todos los datos y métricas que renderiza la UI
+├── layouts/
+└── pages/
+    └── index.astro    # Página única que compone las secciones
+public/charts/         # Gráficas exportadas del notebook
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+> Para cambiar números o textos del dashboard, edita `src/data/results.json`:
+> los componentes leen sus datos de ahí.
