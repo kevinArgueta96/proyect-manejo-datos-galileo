@@ -31,11 +31,6 @@ Abre la URL que imprime la terminal (por defecto `http://localhost:4321`).
 | `pnpm build` | Genera el sitio estático en `dist/` |
 | `pnpm preview` | Sirve el build de producción localmente |
 
-## Publicar
-
-El sitio es estático. Tras `pnpm build`, sube el contenido de `dist/` a cualquier
-host estático (GitHub Pages, Netlify, Vercel).
-
 ## Estructura
 
 ```
